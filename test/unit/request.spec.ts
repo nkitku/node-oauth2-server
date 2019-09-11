@@ -30,7 +30,13 @@ describe('Request', () => {
     request.query.should.eql(originalRequest.query);
     request.body.should.eql(originalRequest.body);
   });
+  it('should convert method string to be the upper case even if the input string is lower case', () => {
+    const originalRequest = generateBaseRequest();
+    originalRequest.method = 'get'
 
+    const request = new Request(originalRequest);
+    request.method.should.eql('GET');
+  });
   it('should allow a request to be passed without a body', () => {
     const originalRequest = generateBaseRequest();
     delete originalRequest.body;
