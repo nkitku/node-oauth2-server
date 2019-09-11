@@ -9,7 +9,7 @@ import { OAuthError } from './oauth-error';
  */
 
 export class InvalidTokenError extends OAuthError {
-  constructor(message?: string | Error, properties?: any) {
-    super(message, { code: 401, name: 'invalid_token', ...properties });
+  constructor(message?: string | Error, properties?: object) {
+    super(message, { code: 400, name: 'invalid_token', ...properties });
   }
 }

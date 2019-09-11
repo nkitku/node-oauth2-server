@@ -1,11 +1,20 @@
 import { defaults, isEmpty } from 'lodash';
 import * as statuses from 'statuses';
 
+interface OAuthErrorProperties {
+  code: number;
+  name: string;
+  [propName: string]: any;
+}
+
 export class OAuthError extends Error {
-  code: any;
-  status: any;
-  statusCode: any;
-  constructor(messageOrError: string | Error, properties?: any) {
+  code: number;
+  status: number;
+  statusCode: number;
+  constructor(
+    messageOrError: string | Error,
+    properties?: OAuthErrorProperties,
+  ) {
     super();
     let message =
       messageOrError instanceof Error ? messageOrError.message : messageOrError;
