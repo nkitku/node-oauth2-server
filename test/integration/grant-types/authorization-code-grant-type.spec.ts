@@ -1,9 +1,11 @@
 import * as should from 'should';
-import { InvalidArgumentError } from '../../../lib/errors/invalid-argument-error';
-import { InvalidGrantError } from '../../../lib/errors/invalid-grant-error';
-import { InvalidRequestError } from '../../../lib/errors/invalid-request-error';
-import { ServerError } from '../../../lib/errors/server-error';
-import { AuthorizationCodeGrantType } from '../../../lib/grant-types/authorization-code-grant-type';
+import {
+  InvalidArgumentError,
+  InvalidGrantError,
+  InvalidRequestError,
+  ServerError,
+} from '../../../lib/errors';
+import { AuthorizationCodeGrantType } from '../../../lib/grant-types';
 import { Request } from '../../../lib/request';
 
 /**
@@ -97,7 +99,7 @@ describe('AuthorizationCodeGrantType integration', () => {
     });
 
     it('should throw an error if `client` is invalid', () => {
-      const client = {};
+      const client: any = {};
       const model = {
         getAuthorizationCode() {
           return {
@@ -116,7 +118,7 @@ describe('AuthorizationCodeGrantType integration', () => {
       const request = new Request({
         body: { code: 12345 },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -152,7 +154,7 @@ describe('AuthorizationCodeGrantType integration', () => {
       const request = new Request({
         body: { code: 12345 },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -165,7 +167,7 @@ describe('AuthorizationCodeGrantType integration', () => {
     });
 
     it('should return a token', async () => {
-      const client = { id: 'foobar' };
+      const client: any = { id: 'foobar' };
       const token = {};
       const model = {
         getAuthorizationCode: () => {
@@ -193,7 +195,7 @@ describe('AuthorizationCodeGrantType integration', () => {
       const request = new Request({
         body: { code: 12345 },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
       try {
@@ -205,7 +207,7 @@ describe('AuthorizationCodeGrantType integration', () => {
     });
 
     it('should support promises', () => {
-      const client = { id: 'foobar' };
+      const client: any = { id: 'foobar' };
       const model = {
         getAuthorizationCode: () => {
           return Promise.resolve({
@@ -227,7 +229,7 @@ describe('AuthorizationCodeGrantType integration', () => {
       const request = new Request({
         body: { code: 12345 },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -235,7 +237,7 @@ describe('AuthorizationCodeGrantType integration', () => {
     });
 
     it('should support non-promises', () => {
-      const client = { id: 'foobar' };
+      const client: any = { id: 'foobar' };
       const model = {
         getAuthorizationCode: () => {
           return {
@@ -257,7 +259,7 @@ describe('AuthorizationCodeGrantType integration', () => {
       const request = new Request({
         body: { code: 12345 },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -265,7 +267,7 @@ describe('AuthorizationCodeGrantType integration', () => {
     });
 
     // it('should support callbacks', () => {
-    //   const client = { id: 'foobar' };
+    //   const client: any = { id: 'foobar' };
     //   const model = {
     //     getAuthorizationCode: (code, callback) => {
     //       callback(undefined, {
@@ -294,7 +296,7 @@ describe('AuthorizationCodeGrantType integration', () => {
     //   const request = new Request({
     //     body: { code: 12345 },
     //     headers: {},
-    //     method: {},
+    //     method: "ANY",
     //     query: {},
     //   });
 
@@ -304,7 +306,7 @@ describe('AuthorizationCodeGrantType integration', () => {
 
   describe('getAuthorizationCode()', () => {
     it('should throw an error if the request body does not contain `code`', async () => {
-      const client = {};
+      const client: any = {};
       const model = {
         getAuthorizationCode: () => {},
         revokeAuthorizationCode: () => {},
@@ -317,7 +319,7 @@ describe('AuthorizationCodeGrantType integration', () => {
       const request = new Request({
         body: {},
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -332,7 +334,7 @@ describe('AuthorizationCodeGrantType integration', () => {
     });
 
     it('should throw an error if `code` is invalid', async () => {
-      const client = {};
+      const client: any = {};
       const model = {
         getAuthorizationCode: () => {},
         revokeAuthorizationCode: () => {},
@@ -345,7 +347,7 @@ describe('AuthorizationCodeGrantType integration', () => {
       const request = new Request({
         body: { code: 'øå€£‰' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -360,7 +362,7 @@ describe('AuthorizationCodeGrantType integration', () => {
     });
 
     it('should throw an error if `authorizationCode` is missing', () => {
-      const client = {};
+      const client: any = {};
       const model = {
         getAuthorizationCode: () => {},
         revokeAuthorizationCode: () => {},
@@ -373,13 +375,15 @@ describe('AuthorizationCodeGrantType integration', () => {
       const request = new Request({
         body: { code: 12345 },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
       return grantType
         .getAuthorizationCode(request, client)
-        .then(() => should.fail('should.fail', ''))
+        .then(() => {
+          should.fail('should.fail', '');
+        })
         .catch(e => {
           e.should.be.an.instanceOf(InvalidGrantError);
           e.message.should.equal(
@@ -389,7 +393,7 @@ describe('AuthorizationCodeGrantType integration', () => {
     });
 
     it('should throw an error if `authorizationCode.client` is missing', () => {
-      const client = {};
+      const client: any = {};
       const model = {
         getAuthorizationCode: () => {
           return { authorizationCode: 12345 };
@@ -404,13 +408,15 @@ describe('AuthorizationCodeGrantType integration', () => {
       const request = new Request({
         body: { code: 12345 },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
       return grantType
         .getAuthorizationCode(request, client)
-        .then(() => should.fail('should.fail', ''))
+        .then(() => {
+          should.fail('should.fail', '');
+        })
         .catch(e => {
           e.should.be.an.instanceOf(ServerError);
           e.message.should.equal(
@@ -420,7 +426,7 @@ describe('AuthorizationCodeGrantType integration', () => {
     });
 
     it('should throw an error if `authorizationCode.expiresAt` is missing', () => {
-      const client = {};
+      const client: any = {};
       const model = {
         getAuthorizationCode: () => {
           return { authorizationCode: 12345, client: {}, user: {} };
@@ -435,13 +441,15 @@ describe('AuthorizationCodeGrantType integration', () => {
       const request = new Request({
         body: { code: 12345 },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
       return grantType
         .getAuthorizationCode(request, client)
-        .then(() => should.fail('should.fail', ''))
+        .then(() => {
+          should.fail('should.fail', '');
+        })
         .catch(e => {
           e.should.be.an.instanceOf(ServerError);
           e.message.should.equal(
@@ -451,7 +459,7 @@ describe('AuthorizationCodeGrantType integration', () => {
     });
 
     it('should throw an error if `authorizationCode.user` is missing', () => {
-      const client = {};
+      const client: any = {};
       const model = {
         getAuthorizationCode: () => {
           return {
@@ -470,13 +478,15 @@ describe('AuthorizationCodeGrantType integration', () => {
       const request = new Request({
         body: { code: 12345 },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
       return grantType
         .getAuthorizationCode(request, client)
-        .then(() => should.fail('should.fail', ''))
+        .then(() => {
+          should.fail('should.fail', '');
+        })
         .catch(e => {
           e.should.be.an.instanceOf(ServerError);
           e.message.should.equal(
@@ -486,7 +496,7 @@ describe('AuthorizationCodeGrantType integration', () => {
     });
 
     it('should throw an error if the client id does not match', () => {
-      const client = { id: 123 };
+      const client: any = { id: 123 };
       const model = {
         getAuthorizationCode() {
           return {
@@ -506,13 +516,15 @@ describe('AuthorizationCodeGrantType integration', () => {
       const request = new Request({
         body: { code: 12345 },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
       return grantType
         .getAuthorizationCode(request, client)
-        .then(() => should.fail('should.fail', ''))
+        .then(() => {
+          should.fail('should.fail', '');
+        })
         .catch(e => {
           e.should.be.an.instanceOf(InvalidGrantError);
           e.message.should.equal(
@@ -522,7 +534,7 @@ describe('AuthorizationCodeGrantType integration', () => {
     });
 
     it('should throw an error if the auth code is expired', () => {
-      const client = { id: 123 };
+      const client: any = { id: 123 };
       const date = new Date(new Date().getTime() / 2);
       const model = {
         getAuthorizationCode() {
@@ -543,13 +555,15 @@ describe('AuthorizationCodeGrantType integration', () => {
       const request = new Request({
         body: { code: 12345 },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
       return grantType
         .getAuthorizationCode(request, client)
-        .then(() => should.fail('should.fail', ''))
+        .then(() => {
+          should.fail('should.fail', '');
+        })
         .catch(e => {
           e.should.be.an.instanceOf(InvalidGrantError);
           e.message.should.equal(
@@ -566,7 +580,7 @@ describe('AuthorizationCodeGrantType integration', () => {
         redirectUri: 'foobar',
         user: {},
       };
-      const client = { id: 'foobar' };
+      const client: any = { id: 'foobar' };
       const model = {
         getAuthorizationCode() {
           return authorizationCode;
@@ -581,13 +595,15 @@ describe('AuthorizationCodeGrantType integration', () => {
       const request = new Request({
         body: { code: 12345 },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
       return grantType
         .getAuthorizationCode(request, client)
-        .then(() => should.fail('should.fail', ''))
+        .then(() => {
+          should.fail('should.fail', '');
+        })
         .catch(e => {
           e.should.be.an.instanceOf(InvalidGrantError);
           e.message.should.equal(
@@ -603,7 +619,7 @@ describe('AuthorizationCodeGrantType integration', () => {
         expiresAt: new Date(new Date().getTime() * 2),
         user: {},
       };
-      const client = { id: 'foobar' };
+      const client: any = { id: 'foobar' };
       const model = {
         getAuthorizationCode() {
           return authorizationCode;
@@ -618,7 +634,7 @@ describe('AuthorizationCodeGrantType integration', () => {
       const request = new Request({
         body: { code: 12345 },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -627,7 +643,9 @@ describe('AuthorizationCodeGrantType integration', () => {
         .then(data => {
           data.should.equal(authorizationCode);
         })
-        .catch(() => should.fail('should.fail', ''));
+        .catch(() => {
+          should.fail('should.fail', '');
+        });
     });
 
     it('should support promises', () => {
@@ -637,7 +655,7 @@ describe('AuthorizationCodeGrantType integration', () => {
         expiresAt: new Date(new Date().getTime() * 2),
         user: {},
       };
-      const client = { id: 'foobar' };
+      const client: any = { id: 'foobar' };
       const model = {
         getAuthorizationCode() {
           return Promise.resolve(authorizationCode);
@@ -652,7 +670,7 @@ describe('AuthorizationCodeGrantType integration', () => {
       const request = new Request({
         body: { code: 12345 },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -668,7 +686,7 @@ describe('AuthorizationCodeGrantType integration', () => {
         expiresAt: new Date(new Date().getTime() * 2),
         user: {},
       };
-      const client = { id: 'foobar' };
+      const client: any = { id: 'foobar' };
       const model = {
         getAuthorizationCode() {
           return authorizationCode;
@@ -683,7 +701,7 @@ describe('AuthorizationCodeGrantType integration', () => {
       const request = new Request({
         body: { code: 12345 },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -699,7 +717,7 @@ describe('AuthorizationCodeGrantType integration', () => {
     //     expiresAt: new Date(new Date().getTime() * 2),
     //     user: {},
     //   };
-    //   const client = { id: 'foobar' };
+    //   const client: any = { id: 'foobar' };
     //   const model = {
     //     getAuthorizationCode(code, callback) {
     //       callback(undefined, authorizationCode);
@@ -714,7 +732,7 @@ describe('AuthorizationCodeGrantType integration', () => {
     //   const request = new Request({
     //     body: { code: 12345 },
     //     headers: {},
-    //     method: {},
+    //     method: "ANY",
     //     query: {},
     //   });
 
@@ -726,7 +744,7 @@ describe('AuthorizationCodeGrantType integration', () => {
 
   describe('validateRedirectUri()', () => {
     it('should throw an error if `redirectUri` is missing', () => {
-      const authorizationCode = {
+      const authorizationCode: any = {
         authorizationCode: 12345,
         client: {},
         expiresAt: new Date(new Date().getTime() / 2),
@@ -747,7 +765,7 @@ describe('AuthorizationCodeGrantType integration', () => {
       const request = new Request({
         body: { code: 12345 },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -764,7 +782,7 @@ describe('AuthorizationCodeGrantType integration', () => {
     });
 
     it('should throw an error if `redirectUri` is invalid', () => {
-      const authorizationCode = {
+      const authorizationCode: any = {
         authorizationCode: 12345,
         client: {},
         expiresAt: new Date(new Date().getTime() / 2),
@@ -785,7 +803,7 @@ describe('AuthorizationCodeGrantType integration', () => {
       const request = new Request({
         body: { code: 12345, redirect_uri: 'http://bar.foo' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -802,7 +820,7 @@ describe('AuthorizationCodeGrantType integration', () => {
 
   describe('revokeAuthorizationCode()', () => {
     it('should revoke the auth code', async () => {
-      const authorizationCode = {
+      const authorizationCode: any = {
         authorizationCode: 12345,
         client: {},
         expiresAt: new Date(new Date().getTime() / 2),
@@ -828,7 +846,7 @@ describe('AuthorizationCodeGrantType integration', () => {
     });
 
     it('should throw an error when the auth code is invalid', () => {
-      const authorizationCode = {
+      const authorizationCode: any = {
         authorizationCode: 12345,
         client: {},
         expiresAt: new Date(new Date().getTime() / 2),
@@ -860,7 +878,7 @@ describe('AuthorizationCodeGrantType integration', () => {
     });
 
     it('should support promises', () => {
-      const authorizationCode = {
+      const authorizationCode: any = {
         authorizationCode: 12345,
         client: {},
         expiresAt: new Date(new Date().getTime() / 2),
@@ -884,7 +902,7 @@ describe('AuthorizationCodeGrantType integration', () => {
     });
 
     it('should support non-promises', () => {
-      const authorizationCode = {
+      const authorizationCode: any = {
         authorizationCode: 12345,
         client: {},
         expiresAt: new Date(new Date().getTime() / 2),

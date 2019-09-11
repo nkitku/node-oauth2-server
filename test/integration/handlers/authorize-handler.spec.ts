@@ -1,18 +1,18 @@
 import * as should from 'should';
 import * as url from 'url';
-import { AccessDeniedError } from '../../../lib/errors/access-denied-error';
-import { InvalidArgumentError } from '../../../lib/errors/invalid-argument-error';
-import { InvalidClientError } from '../../../lib/errors/invalid-client-error';
-import { InvalidRequestError } from '../../../lib/errors/invalid-request-error';
-import { InvalidScopeError } from '../../../lib/errors/invalid-scope-error';
-import { ServerError } from '../../../lib/errors/server-error';
-import { UnauthorizedClientError } from '../../../lib/errors/unauthorized-client-error';
-import { UnsupportedResponseTypeError } from '../../../lib/errors/unsupported-response-type-error';
-import { AuthenticateHandler } from '../../../lib/handlers/authenticate-handler';
-import { AuthorizeHandler } from '../../../lib/handlers/authorize-handler';
+import {
+  AccessDeniedError,
+  InvalidArgumentError,
+  InvalidClientError,
+  InvalidRequestError,
+  InvalidScopeError,
+  ServerError,
+  UnauthorizedClientError,
+} from '../../../lib/errors';
+import { AuthenticateHandler, AuthorizeHandler } from '../../../lib/handlers';
 import { Request } from '../../../lib/request';
 import { Response } from '../../../lib/response';
-import { CodeResponseType } from '../../../lib/response-types/code-response-type';
+import { CodeResponseType } from '../../../lib/response-types';
 
 /**
  * Test `AuthorizeHandler` integration.
@@ -20,18 +20,19 @@ import { CodeResponseType } from '../../../lib/response-types/code-response-type
 
 describe('AuthorizeHandler integration', () => {
   describe('constructor()', () => {
-    it('should throw an error if `options.authorizationCodeLifetime` is missing', () => {
-      try {
-        new AuthorizeHandler();
+    // Move to Code Response Type
+    // it('should throw an error if `options.authorizationCodeLifetime` is missing', () => {
+    //   try {
+    //     new AuthorizeHandler({ model: {} });
 
-        should.fail('should.fail', '');
-      } catch (e) {
-        e.should.be.an.instanceOf(InvalidArgumentError);
-        e.message.should.equal(
-          'Missing parameter: `authorizationCodeLifetime`',
-        );
-      }
-    });
+    //     should.fail('should.fail', '');
+    //   } catch (e) {
+    //     e.should.be.an.instanceOf(InvalidArgumentError);
+    //     e.message.should.equal(
+    //       'Missing parameter: `authorizationCodeLifetime`',
+    //     );
+    //   }
+    // });
 
     it('should throw an error if `options.model` is missing', () => {
       try {
@@ -57,21 +58,22 @@ describe('AuthorizeHandler integration', () => {
       }
     });
 
-    it('should throw an error if the model does not implement `saveAuthorizationCode()`', () => {
-      try {
-        new AuthorizeHandler({
-          authorizationCodeLifetime: 120,
-          model: { getClient: () => {} },
-        });
+    // Move to Code Response Type
+    // it('should throw an error if the model does not implement `saveAuthorizationCode()`', () => {
+    //   try {
+    //     new AuthorizeHandler({
+    //       authorizationCodeLifetime: 120,
+    //       model: { getClient: () => {} },
+    //     });
 
-        should.fail('should.fail', '');
-      } catch (e) {
-        e.should.be.an.instanceOf(InvalidArgumentError);
-        e.message.should.equal(
-          'Invalid argument: model does not implement `saveAuthorizationCode()`',
-        );
-      }
-    });
+    //     should.fail('should.fail', '');
+    //   } catch (e) {
+    //     e.should.be.an.instanceOf(InvalidArgumentError);
+    //     e.message.should.equal(
+    //       'Invalid argument: model does not implement `saveAuthorizationCode()`',
+    //     );
+    //   }
+    // });
 
     it('should throw an error if the model does not implement `getAccessToken()`', () => {
       const model = {
@@ -91,19 +93,19 @@ describe('AuthorizeHandler integration', () => {
       }
     });
 
-    it('should set the `authorizationCodeLifetime`', () => {
-      const model = {
-        getAccessToken: () => {},
-        getClient: () => {},
-        saveAuthorizationCode: () => {},
-      };
-      const handler = new AuthorizeHandler({
-        authorizationCodeLifetime: 120,
-        model,
-      });
+    // it('should set the `authorizationCodeLifetime`', () => {
+    //   const model = {
+    //     getAccessToken: () => {},
+    //     getClient: () => {},
+    //     saveAuthorizationCode: () => {},
+    //   };
+    //   const handler = new AuthorizeHandler({
+    //     authorizationCodeLifetime: 120,
+    //     model,
+    //   });
 
-      handler.authorizationCodeLifetime.should.equal(120);
-    });
+    //   handler.authorizationCodeLifetime.should.equal(120);
+    // });
 
     it('should set the `authenticateHandler`', () => {
       const model = {
@@ -171,7 +173,7 @@ describe('AuthorizeHandler integration', () => {
       const request = new Request({
         body: {},
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -200,14 +202,16 @@ describe('AuthorizeHandler integration', () => {
       const request = new Request({
         body: {},
         headers: {},
-        method: {},
+        method: 'ANY',
         query: { allowed: 'false' },
       });
       const response = new Response({ body: {}, headers: {} });
 
       return handler
         .handle(request, response)
-        .then(() => should.fail('should.fail', ''))
+        .then(() => {
+          should.fail('should.fail', '');
+        })
         .catch(e => {
           e.should.be.an.instanceOf(AccessDeniedError);
           e.message.should.equal(
@@ -246,7 +250,7 @@ describe('AuthorizeHandler integration', () => {
         headers: {
           Authorization: 'Bearer foo',
         },
-        method: {},
+        method: 'ANY',
         query: {
           state: 'foobar',
         },
@@ -255,7 +259,9 @@ describe('AuthorizeHandler integration', () => {
 
       return handler
         .handle(request, response)
-        .then(() => should.fail('should.fail', ''))
+        .then(() => {
+          should.fail('should.fail', '');
+        })
         .catch(() => {
           response
             .get('location')
@@ -295,7 +301,7 @@ describe('AuthorizeHandler integration', () => {
         headers: {
           Authorization: 'Bearer foo',
         },
-        method: {},
+        method: 'ANY',
         query: {
           state: 'foobar',
         },
@@ -347,7 +353,7 @@ describe('AuthorizeHandler integration', () => {
         headers: {
           Authorization: 'Bearer foo',
         },
-        method: {},
+        method: 'ANY',
         query: {
           state: 'foobar',
         },
@@ -361,7 +367,9 @@ describe('AuthorizeHandler integration', () => {
             .get('location')
             .should.equal('http://example.com/cb?code=12345&state=foobar');
         })
-        .catch(() => should.fail('should.fail', ''));
+        .catch(() => {
+          should.fail('should.fail', '');
+        });
     });
 
     it('should redirect to an error response if `scope` is invalid', () => {
@@ -394,7 +402,7 @@ describe('AuthorizeHandler integration', () => {
         headers: {
           Authorization: 'Bearer foo',
         },
-        method: {},
+        method: 'ANY',
         query: {
           scope: [],
           state: 'foobar',
@@ -404,7 +412,9 @@ describe('AuthorizeHandler integration', () => {
 
       return handler
         .handle(request, response)
-        .then(() => should.fail('should.fail', ''))
+        .then(() => {
+          should.fail('should.fail', '');
+        })
         .catch(() => {
           response
             .get('location')
@@ -444,14 +454,16 @@ describe('AuthorizeHandler integration', () => {
         headers: {
           Authorization: 'Bearer foo',
         },
-        method: {},
+        method: 'ANY',
         query: {},
       });
       const response = new Response({ body: {}, headers: {} });
 
       return handler
         .handle(request, response)
-        .then(() => should.fail('should.fail', ''))
+        .then(() => {
+          should.fail('should.fail', '');
+        })
         .catch(() => {
           response
             .get('location')
@@ -491,7 +503,7 @@ describe('AuthorizeHandler integration', () => {
         headers: {
           Authorization: 'Bearer foo',
         },
-        method: {},
+        method: 'ANY',
         query: {
           state: 'foobar',
         },
@@ -500,7 +512,9 @@ describe('AuthorizeHandler integration', () => {
 
       return handler
         .handle(request, response)
-        .then(() => should.fail('should.fail', ''))
+        .then(() => {
+          should.fail('should.fail', '');
+        })
         .catch(() => {
           response.get('location').should.equal(
             // tslint:disable-next-line:max-line-length
@@ -539,7 +553,7 @@ describe('AuthorizeHandler integration', () => {
         headers: {
           Authorization: 'Bearer foo',
         },
-        method: {},
+        method: 'ANY',
         query: {
           state: 'foobar',
         },
@@ -548,7 +562,9 @@ describe('AuthorizeHandler integration', () => {
 
       return handler
         .handle(request, response)
-        .then(() => should.fail('should.fail', ''))
+        .then(() => {
+          should.fail('should.fail', '');
+        })
         .catch(() => {
           response.get('location').should.equal(
             // tslint:disable-next-line:max-line-length
@@ -589,7 +605,7 @@ describe('AuthorizeHandler integration', () => {
         headers: {
           Authorization: 'Bearer foo',
         },
-        method: {},
+        method: 'ANY',
         query: {
           state: 'foobar',
         },
@@ -604,90 +620,92 @@ describe('AuthorizeHandler integration', () => {
             client,
           });
         })
-        .catch(() => should.fail('should.fail', ''));
+        .catch(() => {
+          should.fail('should.fail', '');
+        });
     });
   });
 
-  describe('generateAuthorizationCode()', () => {
-    it('should return an auth code', async () => {
-      const model = {
-        getAccessToken() {},
-        getClient() {},
-        saveAuthorizationCode() {},
-      };
-      const handler = new AuthorizeHandler({
-        authorizationCodeLifetime: 120,
-        model,
-      });
-      try {
-        const data: any = await handler.generateAuthorizationCode(
-          undefined,
-          undefined,
-          undefined,
-        );
-        data.should.be.a.sha1();
-      } catch (error) {
-        should.fail('should.fail', '');
-      }
-    });
+  // describe('generateAuthorizationCode()', () => {
+  //   it('should return an auth code', async () => {
+  //     const model = {
+  //       getAccessToken() {},
+  //       getClient() {},
+  //       saveAuthorizationCode() {},
+  //     };
+  //     const handler = new AuthorizeHandler({
+  //       authorizationCodeLifetime: 120,
+  //       model,
+  //     });
+  //     try {
+  //       const data: any = await handler.generateAuthorizationCode(
+  //         undefined,
+  //         undefined,
+  //         undefined,
+  //       );
+  //       data.should.be.a.sha1();
+  //     } catch (error) {
+  //       should.fail('should.fail', '');
+  //     }
+  //   });
 
-    it('should support promises', async () => {
-      const model = {
-        generateAuthorizationCode() {
-          return Promise.resolve({});
-        },
-        getAccessToken() {},
-        getClient() {},
-        saveAuthorizationCode() {},
-      };
-      const handler = new AuthorizeHandler({
-        authorizationCodeLifetime: 120,
-        model,
-      });
-      try {
-        await handler
-          .generateAuthorizationCode(undefined, undefined, undefined)
-          .should.be.an.instanceOf(Promise);
-      } catch (error) {
-        should.fail('should.fail', '');
-      }
-    });
+  //   it('should support promises', async () => {
+  //     const model = {
+  //       generateAuthorizationCode() {
+  //         return Promise.resolve({});
+  //       },
+  //       getAccessToken() {},
+  //       getClient() {},
+  //       saveAuthorizationCode() {},
+  //     };
+  //     const handler = new AuthorizeHandler({
+  //       authorizationCodeLifetime: 120,
+  //       model,
+  //     });
+  //     try {
+  //       await handler
+  //         .generateAuthorizationCode(undefined, undefined, undefined)
+  //         .should.be.an.instanceOf(Promise);
+  //     } catch (error) {
+  //       should.fail('should.fail', '');
+  //     }
+  //   });
 
-    /*  it('should support non-promises', () => {
-      const model = {
-        generateAuthorizationCode() {
-          return {};
-        },
-        getAccessToken() {},
-        getClient() {},
-        saveAuthorizationCode() {},
-      };
-      const handler = new AuthorizeHandler({
-        authorizationCodeLifetime: 120,
-        model,
-      });
+  //   /*  it('should support non-promises', () => {
+  //     const model = {
+  //       generateAuthorizationCode() {
+  //         return {};
+  //       },
+  //       getAccessToken() {},
+  //       getClient() {},
+  //       saveAuthorizationCode() {},
+  //     };
+  //     const handler = new AuthorizeHandler({
+  //       authorizationCodeLifetime: 120,
+  //       model,
+  //     });
 
-      handler
-        .generateAuthorizationCode(undefined, undefined, undefined)
-        .should.be.an.instanceOf(Promise);
-    }); */
-  });
+  //     handler
+  //       .generateAuthorizationCode(undefined, undefined, undefined)
+  //       .should.be.an.instanceOf(Promise);
+  //   }); */
+  // });
 
-  describe('getAuthorizationCodeLifetime()', () => {
-    it('should return a date', () => {
-      const model = {
-        getAccessToken() {},
-        getClient() {},
-        saveAuthorizationCode() {},
-      };
-      const handler = new AuthorizeHandler({
-        authorizationCodeLifetime: 120,
-        model,
-      });
+  // describe('getAuthorizationCodeLifetime()', () => {
+  //   it('should return a date', () => {
+  //     const model = {
+  //       getAccessToken() {},
+  //       getClient() {},
+  //       saveAuthorizationCode() {},
+  //     };
+  //     const handler = new AuthorizeHandler({
+  //       authorizationCodeLifetime: 120,
+  //       model,
+  //     });
 
-      handler.getAuthorizationCodeLifetime().should.be.an.instanceOf(Date);
-    });
-  });
+  //     handler.getAuthorizationCodeLifetime().should.be.an.instanceOf(Date);
+  //   });
+  // });
 
   describe('getClient()', () => {
     it('should throw an error if `client_id` is missing', async () => {
@@ -703,7 +721,7 @@ describe('AuthorizeHandler integration', () => {
       const request = new Request({
         body: { response_type: 'code' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -730,7 +748,7 @@ describe('AuthorizeHandler integration', () => {
       const request = new Request({
         body: { client_id: 'øå€£‰', response_type: 'code' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -761,7 +779,7 @@ describe('AuthorizeHandler integration', () => {
           redirect_uri: 'foobar',
         },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -790,13 +808,15 @@ describe('AuthorizeHandler integration', () => {
       const request = new Request({
         body: { client_id: 12345, response_type: 'code' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
       return handler
         .getClient(request)
-        .then(() => should.fail('should.fail', ''))
+        .then(() => {
+          should.fail('should.fail', '');
+        })
         .catch(e => {
           e.should.be.an.instanceOf(InvalidClientError);
           e.message.should.equal(
@@ -820,13 +840,15 @@ describe('AuthorizeHandler integration', () => {
       const request = new Request({
         body: { client_id: 12345, response_type: 'code' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
       return handler
         .getClient(request)
-        .then(() => should.fail('should.fail', ''))
+        .then(() => {
+          should.fail('should.fail', '');
+        })
         .catch(e => {
           e.should.be.an.instanceOf(InvalidClientError);
           e.message.should.equal('Invalid client: missing client `grants`');
@@ -848,13 +870,15 @@ describe('AuthorizeHandler integration', () => {
       const request = new Request({
         body: { client_id: 12345, response_type: 'code' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
       return handler
         .getClient(request)
-        .then(() => should.fail('should.fail', ''))
+        .then(() => {
+          should.fail('should.fail', '');
+        })
         .catch(e => {
           e.should.be.an.instanceOf(UnauthorizedClientError);
           e.message.should.equal(
@@ -878,13 +902,15 @@ describe('AuthorizeHandler integration', () => {
       const request = new Request({
         body: { client_id: 12345, response_type: 'code' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
       return handler
         .getClient(request)
-        .then(() => should.fail('should.fail', ''))
+        .then(() => {
+          should.fail('should.fail', '');
+        })
         .catch(e => {
           e.should.be.an.instanceOf(InvalidClientError);
           e.message.should.equal(
@@ -915,13 +941,15 @@ describe('AuthorizeHandler integration', () => {
           redirect_uri: 'https://foobar.com',
         },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
       return handler
         .getClient(request)
-        .then(() => should.fail('should.fail', ''))
+        .then(() => {
+          should.fail('should.fail', '');
+        })
         .catch(e => {
           e.should.be.an.instanceOf(InvalidClientError);
           e.message.should.equal(
@@ -933,11 +961,11 @@ describe('AuthorizeHandler integration', () => {
     it('should support promises', async () => {
       const model = {
         getAccessToken() {},
-        getClient() {
-          return Promise.resolve({
+        async getClient() {
+          return {
             grants: ['authorization_code'],
             redirectUris: ['http://example.com/cb'],
-          });
+          };
         },
         saveAuthorizationCode() {},
       };
@@ -948,11 +976,11 @@ describe('AuthorizeHandler integration', () => {
       const request = new Request({
         body: { client_id: 12345 },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
       try {
-        await handler.getClient(request).should.be.an.instanceOf(Promise);
+        handler.getClient(request).should.be.an.instanceOf(Promise);
       } catch (error) {
         should.fail('should.fail', '');
       }
@@ -976,7 +1004,7 @@ describe('AuthorizeHandler integration', () => {
       const request = new Request({
         body: { client_id: 12345 },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -1002,7 +1030,7 @@ describe('AuthorizeHandler integration', () => {
       const request = new Request({
         body: { client_id: 12345 },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -1029,7 +1057,7 @@ describe('AuthorizeHandler integration', () => {
         const request = new Request({
           body: { response_type: 'code' },
           headers: {},
-          method: {},
+          method: 'ANY',
           query: { client_id: 12345 },
         });
 
@@ -1038,7 +1066,9 @@ describe('AuthorizeHandler integration', () => {
           .then(data => {
             data.should.equal(client);
           })
-          .catch(() => should.fail('should.fail', ''));
+          .catch(() => {
+            should.fail('should.fail', '');
+          });
       });
     });
   });
@@ -1057,7 +1087,7 @@ describe('AuthorizeHandler integration', () => {
       const request = new Request({
         body: { scope: 'øå€£‰' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -1085,7 +1115,7 @@ describe('AuthorizeHandler integration', () => {
         const request = new Request({
           body: { scope: 'foo' },
           headers: {},
-          method: {},
+          method: 'ANY',
           query: {},
         });
 
@@ -1107,7 +1137,7 @@ describe('AuthorizeHandler integration', () => {
         const request = new Request({
           body: {},
           headers: {},
-          method: {},
+          method: 'ANY',
           query: { scope: 'foo' },
         });
 
@@ -1131,7 +1161,7 @@ describe('AuthorizeHandler integration', () => {
       const request = new Request({
         body: {},
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -1158,7 +1188,7 @@ describe('AuthorizeHandler integration', () => {
       const request = new Request({
         body: {},
         headers: {},
-        method: {},
+        method: 'ANY',
         query: { state: 'øå€£‰' },
       });
 
@@ -1186,7 +1216,7 @@ describe('AuthorizeHandler integration', () => {
         const request = new Request({
           body: { state: 'foobar' },
           headers: {},
-          method: {},
+          method: 'ANY',
           query: {},
         });
 
@@ -1208,7 +1238,7 @@ describe('AuthorizeHandler integration', () => {
         const request = new Request({
           body: {},
           headers: {},
-          method: {},
+          method: 'ANY',
           query: { state: 'foobar' },
         });
 
@@ -1232,14 +1262,16 @@ describe('AuthorizeHandler integration', () => {
       const request = new Request({
         body: {},
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
       const response = new Response();
 
       return handler
         .getUser(request, response)
-        .then(() => should.fail('should.fail', ''))
+        .then(() => {
+          should.fail('should.fail', '');
+        })
         .catch(e => {
           e.should.be.an.instanceOf(ServerError);
           e.message.should.equal(
@@ -1267,7 +1299,7 @@ describe('AuthorizeHandler integration', () => {
       const request = new Request({
         body: {},
         headers: { Authorization: 'Bearer foo' },
-        method: {},
+        method: 'ANY',
         query: {},
       });
       const response = new Response({ body: {}, headers: {} });
@@ -1277,205 +1309,207 @@ describe('AuthorizeHandler integration', () => {
         .then(data => {
           data.should.equal(user);
         })
-        .catch(() => should.fail('should.fail', ''));
+        .catch(() => {
+          should.fail('should.fail', '');
+        });
     });
   });
 
-  describe('saveAuthorizationCode()', () => {
-    it('should return an auth code', () => {
-      const authorizationCode = {};
-      const model = {
-        getAccessToken() {},
-        getClient() {},
-        saveAuthorizationCode() {
-          return authorizationCode;
-        },
-      };
-      const handler = new AuthorizeHandler({
-        authorizationCodeLifetime: 120,
-        model,
-      });
+  // describe('saveAuthorizationCode()', () => {
+  //   it('should return an auth code', () => {
+  //     const authorizationCode = {};
+  //     const model = {
+  //       getAccessToken() {},
+  //       getClient() {},
+  //       saveAuthorizationCode() {
+  //         return authorizationCode;
+  //       },
+  //     };
+  //     const handler = new AuthorizeHandler({
+  //       authorizationCodeLifetime: 120,
+  //       model,
+  //     });
 
-      return handler
-        .saveAuthorizationCode(
-          'foo',
-          'bar' as any,
-          'biz',
-          'baz' as any,
-          undefined,
-          undefined,
-        )
-        .then(data => {
-          data.should.equal(authorizationCode);
-        })
-        .catch(() => should.fail('should.fail', ''));
-    });
+  //     return handler
+  //       .saveAuthorizationCode(
+  //         'foo',
+  //         'bar' as any,
+  //         'biz',
+  //         'baz' as any,
+  //         undefined,
+  //         undefined,
+  //       )
+  //       .then(data => {
+  //         data.should.equal(authorizationCode);
+  //       })
+  //       .catch(() => should.fail('should.fail', ''));
+  //   });
 
-    it('should support promises when calling `model.saveAuthorizationCode()`', () => {
-      const model = {
-        getAccessToken() {},
-        getClient() {},
-        saveAuthorizationCode() {
-          return Promise.resolve({});
-        },
-      };
-      const handler = new AuthorizeHandler({
-        authorizationCodeLifetime: 120,
-        model,
-      });
+  //   it('should support promises when calling `model.saveAuthorizationCode()`', () => {
+  //     const model = {
+  //       getAccessToken() {},
+  //       getClient() {},
+  //       saveAuthorizationCode() {
+  //         return Promise.resolve({});
+  //       },
+  //     };
+  //     const handler = new AuthorizeHandler({
+  //       authorizationCodeLifetime: 120,
+  //       model,
+  //     });
 
-      handler
-        .saveAuthorizationCode(
-          'foo',
-          'bar' as any,
-          'biz',
-          'baz' as any,
-          undefined,
-          undefined,
-        )
-        .should.be.an.instanceOf(Promise);
-    });
+  //     handler
+  //       .saveAuthorizationCode(
+  //         'foo',
+  //         'bar' as any,
+  //         'biz',
+  //         'baz' as any,
+  //         undefined,
+  //         undefined,
+  //       )
+  //       .should.be.an.instanceOf(Promise);
+  //   });
 
-    /*    it('should support non-promises when calling `model.saveAuthorizationCode()`', () => {
-      const model = {
-        getAccessToken() {},
-        getClient() {},
-        saveAuthorizationCode() {
-          return {};
-        },
-      };
-      const handler = new AuthorizeHandler({
-        authorizationCodeLifetime: 120,
-        model,
-      });
+  //   /*    it('should support non-promises when calling `model.saveAuthorizationCode()`', () => {
+  //     const model = {
+  //       getAccessToken() {},
+  //       getClient() {},
+  //       saveAuthorizationCode() {
+  //         return {};
+  //       },
+  //     };
+  //     const handler = new AuthorizeHandler({
+  //       authorizationCodeLifetime: 120,
+  //       model,
+  //     });
 
-      handler
-        .saveAuthorizationCode('foo', 'bar', 'biz', 'baz', undefined, undefined)
-        .should.be.an.instanceOf(Promise);
-    }); */
+  //     handler
+  //       .saveAuthorizationCode('foo', 'bar', 'biz', 'baz', undefined, undefined)
+  //       .should.be.an.instanceOf(Promise);
+  //   }); */
 
-    /*     it('should support callbacks when calling `model.saveAuthorizationCode()`', () => {
-      const model = {
-        getAccessToken() {},
-        getClient() {},
-        saveAuthorizationCode(code, client, user, callback) {
-          return callback(null, true);
-        },
-      };
-      const handler = new AuthorizeHandler({
-        authorizationCodeLifetime: 120,
-        model,
-      });
+  //   /*     it('should support callbacks when calling `model.saveAuthorizationCode()`', () => {
+  //     const model = {
+  //       getAccessToken() {},
+  //       getClient() {},
+  //       saveAuthorizationCode(code, client, user, callback) {
+  //         return callback(null, true);
+  //       },
+  //     };
+  //     const handler = new AuthorizeHandler({
+  //       authorizationCodeLifetime: 120,
+  //       model,
+  //     });
 
-      handler
-        .saveAuthorizationCode('foo', 'bar', 'biz', 'baz')
-        .should.be.an.instanceOf(Promise);
-    }); */
-  });
+  //     handler
+  //       .saveAuthorizationCode('foo', 'bar', 'biz', 'baz')
+  //       .should.be.an.instanceOf(Promise);
+  //   }); */
+  // });
 
-  describe('getResponseType()', () => {
-    it('should throw an error if `response_type` is missing', () => {
-      const model = {
-        getAccessToken() {},
-        getClient() {},
-        saveAuthorizationCode() {},
-      };
-      const handler = new AuthorizeHandler({
-        authorizationCodeLifetime: 120,
-        model,
-      });
-      const request = new Request({
-        body: {},
-        headers: {},
-        method: {},
-        query: {},
-      });
+  // describe('getResponseType()', () => {
+  //   it('should throw an error if `response_type` is missing', () => {
+  //     const model = {
+  //       getAccessToken() {},
+  //       getClient() {},
+  //       saveAuthorizationCode() {},
+  //     };
+  //     const handler = new AuthorizeHandler({
+  //       authorizationCodeLifetime: 120,
+  //       model,
+  //     });
+  //     const request = new Request({
+  //       body: {},
+  //       headers: {},
+  //       method: 'ANY',
+  //       query: {},
+  //     });
 
-      try {
-        handler.getResponseType(request);
+  //     try {
+  //       handler.getResponseType(request);
 
-        should.fail('should.fail', '');
-      } catch (e) {
-        e.should.be.an.instanceOf(InvalidRequestError);
-        e.message.should.equal('Missing parameter: `response_type`');
-      }
-    });
+  //       should.fail('should.fail', '');
+  //     } catch (e) {
+  //       e.should.be.an.instanceOf(InvalidRequestError);
+  //       e.message.should.equal('Missing parameter: `response_type`');
+  //     }
+  //   });
 
-    it('should throw an error if `response_type` is not `code`', () => {
-      const model = {
-        getAccessToken() {},
-        getClient() {},
-        saveAuthorizationCode() {},
-      };
-      const handler = new AuthorizeHandler({
-        authorizationCodeLifetime: 120,
-        model,
-      });
-      const request = new Request({
-        body: { response_type: 'foobar' },
-        headers: {},
-        method: {},
-        query: {},
-      });
+  //   it('should throw an error if `response_type` is not `code`', () => {
+  //     const model = {
+  //       getAccessToken() {},
+  //       getClient() {},
+  //       saveAuthorizationCode() {},
+  //     };
+  //     const handler = new AuthorizeHandler({
+  //       authorizationCodeLifetime: 120,
+  //       model,
+  //     });
+  //     const request = new Request({
+  //       body: { response_type: 'foobar' },
+  //       headers: {},
+  //       method: 'ANY',
+  //       query: {},
+  //     });
 
-      try {
-        handler.getResponseType(request);
+  //     try {
+  //       handler.getResponseType(request);
 
-        should.fail('should.fail', '');
-      } catch (e) {
-        e.should.be.an.instanceOf(UnsupportedResponseTypeError);
-        e.message.should.equal(
-          'Unsupported response type: `response_type` is not supported',
-        );
-      }
-    });
+  //       should.fail('should.fail', '');
+  //     } catch (e) {
+  //       e.should.be.an.instanceOf(UnsupportedResponseTypeError);
+  //       e.message.should.equal(
+  //         'Unsupported response type: `response_type` is not supported',
+  //       );
+  //     }
+  //   });
 
-    describe('with `response_type` in the request body', () => {
-      it('should return a response type', () => {
-        const model = {
-          getAccessToken() {},
-          getClient() {},
-          saveAuthorizationCode() {},
-        };
-        const handler = new AuthorizeHandler({
-          authorizationCodeLifetime: 120,
-          model,
-        });
-        const request = new Request({
-          body: { response_type: 'code' },
-          headers: {},
-          method: {},
-          query: {},
-        });
-        const ResponseType = handler.getResponseType(request);
+  //   describe('with `response_type` in the request body', () => {
+  //     it('should return a response type', () => {
+  //       const model = {
+  //         getAccessToken() {},
+  //         getClient() {},
+  //         saveAuthorizationCode() {},
+  //       };
+  //       const handler = new AuthorizeHandler({
+  //         authorizationCodeLifetime: 120,
+  //         model,
+  //       });
+  //       const request = new Request({
+  //         body: { response_type: 'code' },
+  //         headers: {},
+  //         method: 'ANY',
+  //         query: {},
+  //       });
+  //       const ResponseType = handler.getResponseType(request);
 
-        ResponseType.should.equal(CodeResponseType);
-      });
-    });
+  //       ResponseType.should.equal(CodeResponseType);
+  //     });
+  //   });
 
-    describe('with `response_type` in the request query', () => {
-      it('should return a response type', () => {
-        const model = {
-          getAccessToken() {},
-          getClient() {},
-          saveAuthorizationCode() {},
-        };
-        const handler = new AuthorizeHandler({
-          authorizationCodeLifetime: 120,
-          model,
-        });
-        const request = new Request({
-          body: {},
-          headers: {},
-          method: {},
-          query: { response_type: 'code' },
-        });
-        const ResponseType = handler.getResponseType(request);
+  //   describe('with `response_type` in the request query', () => {
+  //     it('should return a response type', () => {
+  //       const model = {
+  //         getAccessToken() {},
+  //         getClient() {},
+  //         saveAuthorizationCode() {},
+  //       };
+  //       const handler = new AuthorizeHandler({
+  //         authorizationCodeLifetime: 120,
+  //         model,
+  //       });
+  //       const request = new Request({
+  //         body: {},
+  //         headers: {},
+  //         method: 'ANY',
+  //         query: { response_type: 'code' },
+  //       });
+  //       const ResponseType = handler.getResponseType(request);
 
-        ResponseType.should.equal(CodeResponseType);
-      });
-    });
-  });
+  //       ResponseType.should.equal(CodeResponseType);
+  //     });
+  //   });
+  // });
 
   describe('buildSuccessRedirectUri()', () => {
     it('should return a redirect uri', () => {
@@ -1488,7 +1522,11 @@ describe('AuthorizeHandler integration', () => {
         authorizationCodeLifetime: 120,
         model,
       });
-      const responseType = new CodeResponseType(12345);
+      const responseType = new CodeResponseType({
+        authorizationCodeLifetime: 360,
+        model: { saveAuthorizationCode: () => {} },
+      });
+      responseType.code = 12345;
       const redirectUri = handler.buildSuccessRedirectUri(
         'http://example.com/cb',
         responseType,
@@ -1510,8 +1548,13 @@ describe('AuthorizeHandler integration', () => {
         authorizationCodeLifetime: 120,
         model,
       });
+      const responseType = new CodeResponseType({
+        authorizationCodeLifetime: 360,
+        model: { saveAuthorizationCode: () => {} },
+      });
       const redirectUri = handler.buildErrorRedirectUri(
         'http://example.com/cb',
+        responseType,
         error,
       );
 
@@ -1525,16 +1568,21 @@ describe('AuthorizeHandler integration', () => {
     it('should return a redirect uri', () => {
       const error = new InvalidClientError();
       const model = {
-        async getAccessToken() {},
-        async getClient() {},
-        async saveAuthorizationCode() {},
+        getAccessToken() {},
+        getClient() {},
+        saveAuthorizationCode() {},
       };
       const handler = new AuthorizeHandler({
         authorizationCodeLifetime: 120,
         model,
       });
+      const responseType = new CodeResponseType({
+        authorizationCodeLifetime: 360,
+        model: { saveAuthorizationCode: () => {} },
+      });
       const redirectUri = handler.buildErrorRedirectUri(
         'http://example.com/cb',
+        responseType,
         error,
       );
 
@@ -1557,10 +1605,14 @@ describe('AuthorizeHandler integration', () => {
         authorizationCodeLifetime: 120,
         model,
       });
+      const responseType = new CodeResponseType({
+        authorizationCodeLifetime: 360,
+        model: { saveAuthorizationCode: () => {} },
+      });
       const response = new Response({ body: {}, headers: {} });
       const uri = url.parse('http://example.com/cb', true);
 
-      handler.updateResponse(response, uri, 'foobar');
+      handler.updateResponse(response, uri, responseType, 'foobar');
 
       response
         .get('location')

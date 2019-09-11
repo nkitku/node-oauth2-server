@@ -1,8 +1,6 @@
-import { InvalidArgumentError } from '../errors/invalid-argument-error';
-import { InvalidScopeError } from '../errors/invalid-scope-error';
-import { Client } from '../interfaces/client.interface';
-import { Model } from '../interfaces/model.interface';
-import { User } from '../interfaces/user.interface';
+import { MILLISECONDS_PER_SECOND } from '../constants';
+import { InvalidArgumentError, InvalidScopeError } from '../errors';
+import { Client, Model, User } from '../interfaces';
 import { Request } from '../request';
 import * as tokenUtil from '../utils/token-util';
 import * as is from '../validator/is';
@@ -38,7 +36,7 @@ export class AbstractGrantType {
     if (this.model.generateAccessToken) {
       const token = await this.model.generateAccessToken(client, user, scope);
 
-      return token || tokenUtil.GenerateRandomToken();
+      return token ? token : tokenUtil.GenerateRandomToken();
     }
 
     return tokenUtil.GenerateRandomToken();
@@ -52,7 +50,7 @@ export class AbstractGrantType {
     if (this.model.generateRefreshToken) {
       const token = await this.model.generateRefreshToken(client, user, scope);
 
-      return token || tokenUtil.GenerateRandomToken();
+      return token ? token : tokenUtil.GenerateRandomToken();
     }
 
     return tokenUtil.GenerateRandomToken();
@@ -63,10 +61,9 @@ export class AbstractGrantType {
    */
 
   getAccessTokenExpiresAt() {
-    const expires = new Date();
-    expires.setSeconds(expires.getSeconds() + this.accessTokenLifetime);
-
-    return expires;
+    return new Date(
+      Date.now() + this.accessTokenLifetime * MILLISECONDS_PER_SECOND,
+    );
   }
 
   /**
@@ -74,37 +71,40 @@ export class AbstractGrantType {
    */
 
   getRefreshTokenExpiresAt() {
-    const expires = new Date();
-    expires.setSeconds(expires.getSeconds() + this.refreshTokenLifetime);
-
-    return expires;
+    return new Date(
+      Date.now() + this.refreshTokenLifetime * MILLISECONDS_PER_SECOND,
+    );
   }
 
   /**
    * Get scope from the request body.
    */
 
-  getScope = (request: Request) => {
+  getScope(request: Request) {
     if (!is.nqschar(request.body.scope)) {
       throw new InvalidArgumentError('Invalid parameter: `scope`');
     }
 
     return request.body.scope;
-  };
+  }
 
   /**
    * Validate requested scope.
    */
   async validateScope(user: User, client: Client, scope: string) {
     if (this.model.validateScope) {
-      const sc = await this.model.validateScope(user, client, scope);
-      if (!sc) {
+      const validatedScope = await this.model.validateScope(
+        user,
+        client,
+        scope,
+      );
+      if (!validatedScope) {
         throw new InvalidScopeError(
           'Invalid scope: Requested scope is invalid',
         );
       }
 
-      return sc;
+      return validatedScope;
     }
 
     return scope;

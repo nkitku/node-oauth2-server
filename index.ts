@@ -1,2 +1,10 @@
-import { OAuth2Server } from './lib/server';
-export default OAuth2Server;
+export * from './lib/errors';
+export * from './lib/grant-types';
+export * from './lib/handlers';
+export * from './lib/interfaces';
+export { Request } from './lib/request';
+export { Response } from './lib/response';
+export * from './lib/response-types';
+export { OAuth2Server } from './lib/server';
+export * from './lib/token-types';
+export * from './lib/validator/is';

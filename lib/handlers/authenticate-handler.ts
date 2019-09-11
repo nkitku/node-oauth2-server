@@ -1,12 +1,14 @@
-import { InsufficientScopeError } from '../errors/insufficient-scope-error';
-import { InvalidArgumentError } from '../errors/invalid-argument-error';
-import { InvalidRequestError } from '../errors/invalid-request-error';
-import { InvalidTokenError } from '../errors/invalid-token-error';
-import { OAuthError } from '../errors/oauth-error';
-import { ServerError } from '../errors/server-error';
-import { UnauthorizedRequestError } from '../errors/unauthorized-request-error';
-import { Model } from '../interfaces/model.interface';
-import { Token } from '../interfaces/token.interface';
+import { isUndefined } from 'lodash';
+import {
+  InsufficientScopeError,
+  InvalidArgumentError,
+  InvalidRequestError,
+  InvalidTokenError,
+  OAuthError,
+  ServerError,
+  UnauthorizedRequestError,
+} from '../errors';
+import { Model, Token } from '../interfaces';
 import { Request } from '../request';
 import { Response } from '../response';
 
@@ -27,13 +29,13 @@ export class AuthenticateHandler {
       );
     }
 
-    if (options.scope && options.addAcceptedScopesHeader === undefined) {
+    if (options.scope && isUndefined(options.addAcceptedScopesHeader)) {
       throw new InvalidArgumentError(
         'Missing parameter: `addAcceptedScopesHeader`',
       );
     }
 
-    if (options.scope && options.addAuthorizedScopesHeader === undefined) {
+    if (options.scope && isUndefined(options.addAuthorizedScopesHeader)) {
       throw new InvalidArgumentError(
         'Missing parameter: `addAuthorizedScopesHeader`',
       );
@@ -69,14 +71,18 @@ export class AuthenticateHandler {
         'Invalid argument: `response` must be an instance of Response',
       );
     }
+
+    // Extend model object with request
+    this.model.request = request;
+
     try {
       let token = await this.getTokenFromRequest(request);
       token = await this.getAccessToken(token);
-      await this.validateAccessToken(token);
+      this.validateAccessToken(token);
       if (this.scope) {
         await this.verifyScope(token);
       }
-      await this.updateResponse(response, token);
+      this.updateResponse(response, token);
 
       return token;
     } catch (e) {
@@ -138,7 +144,7 @@ export class AuthenticateHandler {
    * @see http://tools.ietf.org/html/rfc6750#section-2.1
    */
 
-  getTokenFromRequestHeader = (request: Request) => {
+  getTokenFromRequestHeader(request: Request) {
     const token = request.get('Authorization');
     const matches = token.match(/Bearer\s(\S+)/);
 
@@ -149,7 +155,7 @@ export class AuthenticateHandler {
     }
 
     return matches[1];
-  };
+  }
 
   /**
    * Get the token from the request query.
@@ -184,7 +190,7 @@ export class AuthenticateHandler {
    * @see http://tools.ietf.org/html/rfc6750#section-2.2
    */
 
-  getTokenFromRequestBody = (request: Request) => {
+  getTokenFromRequestBody(request: Request) {
     if (request.method === 'GET') {
       throw new InvalidRequestError(
         'Invalid request: token may not be passed in the body when using the GET verb',
@@ -198,7 +204,7 @@ export class AuthenticateHandler {
     }
 
     return request.body.access_token;
-  };
+  }
 
   /**
    * Get the access token from the model.
@@ -223,19 +229,19 @@ export class AuthenticateHandler {
    * Validate access token.
    */
 
-  validateAccessToken = (accessToken: Token) => {
+  validateAccessToken(accessToken: Token) {
     if (!(accessToken.accessTokenExpiresAt instanceof Date)) {
       throw new ServerError(
         'Server error: `accessTokenExpiresAt` must be a Date instance',
       );
     }
 
-    if (accessToken.accessTokenExpiresAt < new Date()) {
+    if (accessToken.accessTokenExpiresAt.getTime() < Date.now()) {
       throw new InvalidTokenError('Invalid token: access token has expired');
     }
 
     return accessToken;
-  };
+  }
 
   /**
    * Verify scope.
@@ -256,7 +262,7 @@ export class AuthenticateHandler {
    * Update response.
    */
 
-  updateResponse(response: Response, accessToken) {
+  updateResponse(response: Response, accessToken: Token) {
     if (this.scope && this.addAcceptedScopesHeader) {
       response.set('X-Accepted-OAuth-Scopes', this.scope);
     }

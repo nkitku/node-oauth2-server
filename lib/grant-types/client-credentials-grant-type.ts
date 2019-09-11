@@ -1,10 +1,7 @@
-import { InvalidArgumentError } from '../errors/invalid-argument-error';
-import { InvalidGrantError } from '../errors/invalid-grant-error';
-import { Client } from '../interfaces/client.interface';
-import { Token } from '../interfaces/token.interface';
-import { User } from '../interfaces/user.interface';
+import { AbstractGrantType } from '.';
+import { InvalidArgumentError, InvalidGrantError } from '../errors';
+import { Client, Token, User } from '../interfaces';
 import { Request } from '../request';
-import { AbstractGrantType } from './abstract-grant-type';
 
 export class ClientCredentialsGrantType extends AbstractGrantType {
   constructor(options: any = {}) {
@@ -67,15 +64,9 @@ export class ClientCredentialsGrantType extends AbstractGrantType {
    */
 
   async saveToken(user: User, client: Client, scope: string) {
-    const fns = [
-      this.validateScope(user, client, scope),
-      this.generateAccessToken(client, user, scope),
-      this.getAccessTokenExpiresAt(),
-    ];
-
-    const [accessScope, accessToken, accessTokenExpiresAt] = await Promise.all(
-      fns as any,
-    );
+    const accessScope = await this.validateScope(user, client, scope);
+    const accessToken = await this.generateAccessToken(client, user, scope);
+    const accessTokenExpiresAt = this.getAccessTokenExpiresAt();
 
     const token = {
       accessToken,

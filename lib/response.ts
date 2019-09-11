@@ -1,3 +1,5 @@
+import { hasOwnProperty } from './utils/fn';
+
 export class Response {
   body: any;
   headers: any;
@@ -8,15 +10,15 @@ export class Response {
     this.status = 200;
 
     // Store the headers in lower case.
-    for (const field in options.headers) {
-      if (options.headers.hasOwnProperty(field)) {
+    for (const field of Object.keys(options.headers || {})) {
+      if (hasOwnProperty(options.headers, field)) {
         this.headers[field.toLowerCase()] = options.headers[field];
       }
     }
 
     // Store additional properties of the response object passed in
-    for (const property in options) {
-      if (options.hasOwnProperty(property) && !this[property]) {
+    for (const property of Object.keys(options)) {
+      if (hasOwnProperty(options, property) && !this[property]) {
         this[property] = options[property];
       }
     }
@@ -26,7 +28,7 @@ export class Response {
    * Get a response header.
    */
 
-  get(field) {
+  get(field: string) {
     return this.headers[field.toLowerCase()];
   }
 

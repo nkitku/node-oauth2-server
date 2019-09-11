@@ -1,12 +1,14 @@
 import * as should from 'should';
-import { AccessDeniedError } from '../../../lib/errors/access-denied-error';
-import { InsufficientScopeError } from '../../../lib/errors/insufficient-scope-error';
-import { InvalidArgumentError } from '../../../lib/errors/invalid-argument-error';
-import { InvalidRequestError } from '../../../lib/errors/invalid-request-error';
-import { InvalidTokenError } from '../../../lib/errors/invalid-token-error';
-import { ServerError } from '../../../lib/errors/server-error';
-import { UnauthorizedRequestError } from '../../../lib/errors/unauthorized-request-error';
-import { AuthenticateHandler } from '../../../lib/handlers/authenticate-handler';
+import {
+  AccessDeniedError,
+  InsufficientScopeError,
+  InvalidArgumentError,
+  InvalidRequestError,
+  InvalidTokenError,
+  ServerError,
+  UnauthorizedRequestError,
+} from '../../../lib/errors';
+import { AuthenticateHandler } from '../../../lib/handlers';
 import { Request } from '../../../lib/request';
 import { Response } from '../../../lib/response';
 
@@ -140,14 +142,16 @@ describe('AuthenticateHandler integration', () => {
       const request = new Request({
         body: {},
         headers: { Authorization: 'Bearer foo' },
-        method: {},
+        method: 'ANY',
         query: {},
       });
       const response = new Response({ body: {}, headers: {} });
 
       return handler
         .handle(request, response)
-        .then(() => should.fail('should.fail', ''))
+        .then(() => {
+          should.fail('should.fail', '');
+        })
         .catch(() => {
           response
             .get('WWW-Authenticate')
@@ -165,14 +169,16 @@ describe('AuthenticateHandler integration', () => {
       const request = new Request({
         body: {},
         headers: { Authorization: 'Bearer foo' },
-        method: {},
+        method: 'ANY',
         query: {},
       });
       const response = new Response({ body: {}, headers: {} });
 
       return handler
         .handle(request, response)
-        .then(() => should.fail('should.fail', ''))
+        .then(() => {
+          should.fail('should.fail', '');
+        })
         .catch(e => {
           e.should.be.an.instanceOf(AccessDeniedError);
           e.message.should.equal('Cannot request this access token');
@@ -189,14 +195,16 @@ describe('AuthenticateHandler integration', () => {
       const request = new Request({
         body: {},
         headers: { Authorization: 'Bearer foo' },
-        method: {},
+        method: 'ANY',
         query: {},
       });
       const response = new Response({ body: {}, headers: {} });
 
       return handler
         .handle(request, response)
-        .then(() => should.fail('should.fail', ''))
+        .then(() => {
+          should.fail('should.fail', '');
+        })
         .catch(e => {
           e.should.be.an.instanceOf(ServerError);
           e.message.should.equal('Unhandled exception');
@@ -225,7 +233,7 @@ describe('AuthenticateHandler integration', () => {
       const request = new Request({
         body: {},
         headers: { Authorization: 'Bearer foo' },
-        method: {},
+        method: 'ANY',
         query: {},
       });
       const response = new Response({ body: {}, headers: {} });
@@ -235,7 +243,9 @@ describe('AuthenticateHandler integration', () => {
         .then(data => {
           data.should.equal(accessToken);
         })
-        .catch(() => should.fail('should.fail', ''));
+        .catch(() => {
+          should.fail('should.fail', '');
+        });
     });
   });
 
@@ -247,7 +257,7 @@ describe('AuthenticateHandler integration', () => {
       const request = new Request({
         body: {},
         headers: { Authorization: 'Bearer foo' },
-        method: {},
+        method: 'ANY',
         query: { access_token: 'foo' },
       });
 
@@ -270,7 +280,7 @@ describe('AuthenticateHandler integration', () => {
       const request = new Request({
         body: {},
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -295,7 +305,7 @@ describe('AuthenticateHandler integration', () => {
         headers: {
           Authorization: 'foobar',
         },
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -320,7 +330,7 @@ describe('AuthenticateHandler integration', () => {
         headers: {
           Authorization: 'Bearer foo',
         },
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -388,7 +398,7 @@ describe('AuthenticateHandler integration', () => {
       const request = new Request({
         body: { access_token: 'foo' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -414,7 +424,7 @@ describe('AuthenticateHandler integration', () => {
           'content-type': 'application/x-www-form-urlencoded',
           'transfer-encoding': 'chunked',
         },
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -431,7 +441,9 @@ describe('AuthenticateHandler integration', () => {
 
       return handler
         .getAccessToken('foo')
-        .then(() => should.fail('should.fail', ''))
+        .then(() => {
+          should.fail('should.fail', '');
+        })
         .catch(e => {
           e.should.be.an.instanceOf(InvalidTokenError);
           e.message.should.equal('Invalid token: access token is invalid');
@@ -448,7 +460,9 @@ describe('AuthenticateHandler integration', () => {
 
       return handler
         .getAccessToken('foo')
-        .then(() => should.fail('should.fail', ''))
+        .then(() => {
+          should.fail('should.fail', '');
+        })
         .catch(e => {
           e.should.be.an.instanceOf(ServerError);
           e.message.should.equal(
@@ -471,7 +485,9 @@ describe('AuthenticateHandler integration', () => {
         .then(data => {
           data.should.equal(accessToken);
         })
-        .catch(() => should.fail('should.fail', ''));
+        .catch(() => {
+          should.fail('should.fail', '');
+        });
     });
 
     it('should support promises', () => {
@@ -557,7 +573,9 @@ describe('AuthenticateHandler integration', () => {
 
       return handler
         .verifyScope('foo' as any)
-        .then(() => should.fail('should.fail', ''))
+        .then(() => {
+          should.fail('should.fail', '');
+        })
         .catch(e => {
           e.should.be.an.instanceOf(InsufficientScopeError);
           e.message.should.equal(
@@ -631,7 +649,7 @@ describe('AuthenticateHandler integration', () => {
       });
       const response = new Response({ body: {}, headers: {} });
 
-      handler.updateResponse(response, { scope: 'foo biz' });
+      handler.updateResponse(response, { scope: 'foo biz' } as any);
 
       response.headers.should.not.have.property('x-accepted-oauth-scopes');
     });
@@ -649,7 +667,7 @@ describe('AuthenticateHandler integration', () => {
       });
       const response = new Response({ body: {}, headers: {} });
 
-      handler.updateResponse(response, { scope: 'foo biz' });
+      handler.updateResponse(response, { scope: 'foo biz' } as any);
 
       response.get('X-Accepted-OAuth-Scopes').should.equal('foo bar');
     });
@@ -666,7 +684,7 @@ describe('AuthenticateHandler integration', () => {
       });
       const response = new Response({ body: {}, headers: {} });
 
-      handler.updateResponse(response, { scope: 'foo biz' });
+      handler.updateResponse(response, { scope: 'foo biz' } as any);
 
       response.headers.should.not.have.property('x-oauth-scopes');
     });
@@ -684,7 +702,7 @@ describe('AuthenticateHandler integration', () => {
       });
       const response = new Response({ body: {}, headers: {} });
 
-      handler.updateResponse(response, { scope: 'foo biz' });
+      handler.updateResponse(response, { scope: 'foo biz' } as any);
 
       response.get('X-OAuth-Scopes').should.equal('foo biz');
     });

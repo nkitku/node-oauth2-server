@@ -1,21 +1,27 @@
 import * as auth from 'basic-auth';
-import { has } from 'lodash';
-import { InvalidArgumentError } from '../errors/invalid-argument-error';
-import { InvalidClientError } from '../errors/invalid-client-error';
-import { InvalidRequestError } from '../errors/invalid-request-error';
-import { OAuthError } from '../errors/oauth-error';
-import { ServerError } from '../errors/server-error';
-import { UnauthorizedClientError } from '../errors/unauthorized-client-error';
-import { UnsupportedGrantTypeError } from '../errors/unsupported-grant-type-error';
-import { AuthorizationCodeGrantType } from '../grant-types/authorization-code-grant-type';
-import { ClientCredentialsGrantType } from '../grant-types/client-credentials-grant-type';
-import { PasswordGrantType } from '../grant-types/password-grant-type';
-import { RefreshTokenGrantType } from '../grant-types/refresh-token-grant-type';
-import { TokenModel } from '../models/token-model';
+import {
+  InvalidArgumentError,
+  InvalidClientError,
+  InvalidRequestError,
+  OAuthError,
+  ServerError,
+  UnauthorizedClientError,
+  UnsupportedGrantTypeError,
+} from '../errors';
+import {
+  AuthorizationCodeGrantType,
+  ClientCredentialsGrantType,
+  PasswordGrantType,
+  RefreshTokenGrantType,
+} from '../grant-types';
+import { Client, Model } from '../interfaces';
+import { TokenModel } from '../models';
 import { Request } from '../request';
 import { Response } from '../response';
-import { BearerTokenType } from '../token-types/bearer-token-type';
+import { BearerTokenType } from '../token-types';
+import { hasOwnProperty } from '../utils/fn';
 import * as is from '../validator/is';
+
 /**
  * Grant types.
  */
@@ -26,13 +32,12 @@ const grantTypes = {
   password: PasswordGrantType,
   refresh_token: RefreshTokenGrantType,
 };
-
 export class TokenHandler {
   accessTokenLifetime: any;
-  grantTypes: any;
-  model: any;
-  refreshTokenLifetime: any;
-  allowExtendedTokenAttributes: any;
+  grantTypes: { [key: string]: any };
+  model: Model;
+  refreshTokenLifetime: number;
+  allowExtendedTokenAttributes: boolean;
   requireClientAuthentication: any;
   alwaysIssueNewRefreshToken: boolean;
   constructor(options: any = {}) {
@@ -87,9 +92,7 @@ export class TokenHandler {
     }
 
     if (request.method !== 'POST') {
-      // return Promise.reject(
       throw new InvalidRequestError('Invalid request: method must be POST');
-      // );
     }
 
     if (!request.is('application/x-www-form-urlencoded')) {
@@ -97,6 +100,10 @@ export class TokenHandler {
         'Invalid request: content must be application/x-www-form-urlencoded',
       );
     }
+
+    // Extend model object with request
+    this.model.request = request;
+
     try {
       const client = await this.getClient(request, response);
       const data = await this.handleGrantType(request, client);
@@ -184,8 +191,8 @@ export class TokenHandler {
    * @see https://tools.ietf.org/html/rfc6749#section-2.3.1
    */
 
-  getClientCredentials(request) {
-    const credentials = auth(request);
+  getClientCredentials(request: Request) {
+    const credentials = auth(request as any);
     const grantType = request.body.grant_type;
 
     if (credentials) {
@@ -202,10 +209,11 @@ export class TokenHandler {
       };
     }
 
-    if (!this.isClientAuthenticationRequired(grantType)) {
-      if (request.body.client_id) {
-        return { clientId: request.body.client_id };
-      }
+    if (
+      !this.isClientAuthenticationRequired(grantType) &&
+      request.body.client_id
+    ) {
+      return { clientId: request.body.client_id };
     }
 
     throw new InvalidClientError(
@@ -217,7 +225,7 @@ export class TokenHandler {
    * Handle grant type.
    */
 
-  async handleGrantType(request: Request, client) {
+  async handleGrantType(request: Request, client: Client) {
     const grantType = request.body.grant_type;
 
     if (!grantType) {
@@ -228,7 +236,7 @@ export class TokenHandler {
       throw new InvalidRequestError('Invalid parameter: `grant_type`');
     }
 
-    if (!has(this.grantTypes, grantType)) {
+    if (!hasOwnProperty(this.grantTypes, grantType)) {
       throw new UnsupportedGrantTypeError(
         'Unsupported grant type: `grant_type` is invalid',
       );
@@ -242,7 +250,7 @@ export class TokenHandler {
 
     const accessTokenLifetime = this.getAccessTokenLifetime(client);
     const refreshTokenLifetime = this.getRefreshTokenLifetime(client);
-    const Type = this.grantTypes[grantType];
+    const GrantType = this.grantTypes[grantType];
 
     const options = {
       accessTokenLifetime,
@@ -251,14 +259,14 @@ export class TokenHandler {
       alwaysIssueNewRefreshToken: this.alwaysIssueNewRefreshToken,
     };
 
-    return new Type(options).handle(request, client);
+    return new GrantType(options).handle(request, client);
   }
 
   /**
    * Get access token lifetime.
    */
 
-  getAccessTokenLifetime(client) {
+  getAccessTokenLifetime(client: Client) {
     return client.accessTokenLifetime || this.accessTokenLifetime;
   }
 
@@ -266,7 +274,7 @@ export class TokenHandler {
    * Get refresh token lifetime.
    */
 
-  getRefreshTokenLifetime(client) {
+  getRefreshTokenLifetime(client: Client) {
     return client.refreshTokenLifetime || this.refreshTokenLifetime;
   }
 
@@ -274,7 +282,7 @@ export class TokenHandler {
    * Get token type.
    */
 
-  getTokenType = model => {
+  getTokenType(model: any) {
     return new BearerTokenType(
       model.accessToken,
       model.accessTokenLifetime,
@@ -282,36 +290,36 @@ export class TokenHandler {
       model.scope,
       model.customAttributes,
     );
-  };
+  }
 
   /**
    * Update response when a token is generated.
    */
 
-  updateSuccessResponse = (response, tokenType) => {
+  updateSuccessResponse(response: Response, tokenType: BearerTokenType) {
     response.body = tokenType.valueOf();
 
     response.set('Cache-Control', 'no-store');
     response.set('Pragma', 'no-cache');
-  };
+  }
 
   /**
    * Update response when an error is thrown.
    */
 
-  updateErrorResponse = (response, error) => {
+  updateErrorResponse(response: Response, error: OAuthError) {
     response.body = {
       error: error.name,
       error_description: error.message,
     };
 
     response.status = error.code;
-  };
+  }
 
   /**
    * Given a grant type, check if client authentication is required
    */
-  isClientAuthenticationRequired = grantType => {
+  isClientAuthenticationRequired(grantType: string) {
     if (Object.keys(this.requireClientAuthentication).length > 0) {
       return typeof this.requireClientAuthentication[grantType] !== 'undefined'
         ? this.requireClientAuthentication[grantType]
@@ -319,5 +327,5 @@ export class TokenHandler {
     }
 
     return true;
-  };
+  }
 }

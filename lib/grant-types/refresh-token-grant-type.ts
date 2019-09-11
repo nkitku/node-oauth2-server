@@ -1,13 +1,13 @@
-import { InvalidArgumentError } from '../errors/invalid-argument-error';
-import { InvalidGrantError } from '../errors/invalid-grant-error';
-import { InvalidRequestError } from '../errors/invalid-request-error';
-import { ServerError } from '../errors/server-error';
-import { Client } from '../interfaces/client.interface';
-import { RefreshToken } from '../interfaces/refresh-token.interface';
-import { User } from '../interfaces/user.interface';
+import { AbstractGrantType } from '.';
+import {
+  InvalidArgumentError,
+  InvalidGrantError,
+  InvalidRequestError,
+  ServerError,
+} from '../errors';
+import { Client, RefreshToken, User } from '../interfaces';
 import { Request } from '../request';
 import * as is from '../validator/is';
-import { AbstractGrantType } from './abstract-grant-type';
 
 export class RefreshTokenGrantType extends AbstractGrantType {
   constructor(options: any = {}) {
@@ -103,7 +103,7 @@ export class RefreshTokenGrantType extends AbstractGrantType {
 
     if (
       token.refreshTokenExpiresAt &&
-      token.refreshTokenExpiresAt < new Date()
+      token.refreshTokenExpiresAt.getTime() < Date.now()
     ) {
       throw new InvalidGrantError('Invalid grant: refresh token has expired');
     }
@@ -135,19 +135,10 @@ export class RefreshTokenGrantType extends AbstractGrantType {
    */
 
   async saveToken(user: User, client: Client, scope: string) {
-    const fns = [
-      this.generateAccessToken(client, user, scope),
-      this.generateRefreshToken(client, user, scope),
-      this.getAccessTokenExpiresAt(),
-      this.getRefreshTokenExpiresAt(),
-    ];
-
-    const [
-      accessToken,
-      refreshToken,
-      accessTokenExpiresAt,
-      refreshTokenExpiresAt,
-    ] = await Promise.all(fns as any);
+    const accessToken = await this.generateAccessToken(client, user, scope);
+    const refreshToken = await this.generateRefreshToken(client, user, scope);
+    const accessTokenExpiresAt = this.getAccessTokenExpiresAt();
+    const refreshTokenExpiresAt = this.getRefreshTokenExpiresAt();
 
     const token: any = {
       accessToken,

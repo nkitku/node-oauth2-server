@@ -1,6 +1,6 @@
 import * as should from 'should';
 import * as sinon from 'sinon';
-import { TokenHandler } from '../../../lib/handlers/token-handler';
+import { TokenHandler } from '../../../lib/handlers';
 import { Request } from '../../../lib/request';
 
 /**
@@ -24,7 +24,7 @@ describe('TokenHandler', () => {
       const request = new Request({
         body: { client_id: 12345, client_secret: 'secret' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 

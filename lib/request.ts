@@ -1,12 +1,21 @@
 import * as typeis from 'type-is';
-import { InvalidArgumentError } from './errors/invalid-argument-error';
+import { InvalidArgumentError } from './errors';
+import { hasOwnProperty } from './utils/fn';
 
 export class Request {
   body: any;
   headers: any;
-  method: any;
+  method: string;
   query: any;
-  constructor(options: any = {}) {
+  constructor(
+    options: {
+      body: any;
+      headers: any;
+      method: string;
+      query: any;
+      [key: string]: any;
+    } = {} as any,
+  ) {
     if (!options.headers) {
       throw new InvalidArgumentError('Missing parameter: `headers`');
     }
@@ -15,25 +24,29 @@ export class Request {
       throw new InvalidArgumentError('Missing parameter: `method`');
     }
 
+    if (typeof options.method !== 'string') {
+      throw new InvalidArgumentError('Invalid parameter: `method`');
+    }
+
     if (!options.query) {
       throw new InvalidArgumentError('Missing parameter: `query`');
     }
 
     this.body = options.body || {};
     this.headers = {};
-    this.method = options.method;
+    this.method = options.method.toUpperCase();
     this.query = options.query;
 
     // Store the headers in lower case.
-    for (const field in options.headers) {
-      if (options.headers.hasOwnProperty(field)) {
+    for (const field of Object.keys(options.headers)) {
+      if (hasOwnProperty(options.headers, field)) {
         this.headers[field.toLowerCase()] = options.headers[field];
       }
     }
 
     // Store additional properties of the request object passed in
-    for (const property in options) {
-      if (options.hasOwnProperty(property) && !this[property]) {
+    for (const property of Object.keys(options)) {
+      if (hasOwnProperty(options, property) && !this[property]) {
         this[property] = options[property];
       }
     }
@@ -43,7 +56,7 @@ export class Request {
    * Get a request header.
    */
 
-  get(field) {
+  get(field: string) {
     return this.headers[field.toLowerCase()];
   }
 

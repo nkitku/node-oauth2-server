@@ -1,6 +1,6 @@
 import * as should from 'should';
 import * as sinon from 'sinon';
-import { AuthorizationCodeGrantType } from '../../../lib/grant-types/authorization-code-grant-type';
+import { AuthorizationCodeGrantType } from '../../../lib/grant-types';
 import { Request } from '../../../lib/request';
 
 /**
@@ -27,10 +27,10 @@ describe('AuthorizationCodeGrantType', () => {
       const request = new Request({
         body: { code: 12345 },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
-      const client = {};
+      const client: any = {};
       try {
         await handler.getAuthorizationCode(request, client);
 
@@ -55,7 +55,7 @@ describe('AuthorizationCodeGrantType', () => {
         accessTokenLifetime: 120,
         model,
       });
-      const authorizationCode = {};
+      const authorizationCode: any = {};
       try {
         await handler.revokeAuthorizationCode(authorizationCode);
 
@@ -92,12 +92,8 @@ describe('AuthorizationCodeGrantType', () => {
       sinon
         .stub(handler, 'generateRefreshToken')
         .returns(Promise.resolve('bar'));
-      sinon
-        .stub(handler, 'getAccessTokenExpiresAt')
-        .returns(Promise.resolve('biz') as any);
-      sinon
-        .stub(handler, 'getRefreshTokenExpiresAt')
-        .returns(Promise.resolve('baz') as any);
+      sinon.stub(handler, 'getAccessTokenExpiresAt').returns('biz' as any);
+      sinon.stub(handler, 'getRefreshTokenExpiresAt').returns('baz' as any);
       try {
         await handler.saveToken(user, client, 'foobar', 'foobiz');
         model.saveToken.callCount.should.equal(1);

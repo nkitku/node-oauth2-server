@@ -1,9 +1,11 @@
 import * as should from 'should';
-import { InvalidArgumentError } from '../../../lib/errors/invalid-argument-error';
-import { InvalidGrantError } from '../../../lib/errors/invalid-grant-error';
-import { InvalidRequestError } from '../../../lib/errors/invalid-request-error';
-import { ServerError } from '../../../lib/errors/server-error';
-import { RefreshTokenGrantType } from '../../../lib/grant-types/refresh-token-grant-type';
+import {
+  InvalidArgumentError,
+  InvalidGrantError,
+  InvalidRequestError,
+  ServerError,
+} from '../../../lib/errors';
+import { RefreshTokenGrantType } from '../../../lib/grant-types';
 import { Request } from '../../../lib/request';
 
 /**
@@ -39,7 +41,7 @@ describe('RefreshTokenGrantType integration', () => {
     it('should throw an error if the model does not implement `revokeToken()`', () => {
       try {
         const model = {
-          async getRefreshToken() {},
+          getRefreshToken() {},
         };
 
         new RefreshTokenGrantType({ accessTokenLifetime: 3600, model });
@@ -56,8 +58,8 @@ describe('RefreshTokenGrantType integration', () => {
     it('should throw an error if the model does not implement `saveToken()`', () => {
       try {
         const model = {
-          async getRefreshToken() {},
-          async revokeToken() {},
+          getRefreshToken() {},
+          revokeToken() {},
         };
 
         new RefreshTokenGrantType({ accessTokenLifetime: 3600, model });
@@ -107,7 +109,7 @@ describe('RefreshTokenGrantType integration', () => {
       const request = new Request({
         body: {},
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -147,7 +149,7 @@ describe('RefreshTokenGrantType integration', () => {
       const request = new Request({
         body: { refresh_token: 'foobar' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -156,7 +158,9 @@ describe('RefreshTokenGrantType integration', () => {
         .then(data => {
           data.should.equal(token);
         })
-        .catch(() => should.fail('should.fail', ''));
+        .catch(() => {
+          should.fail('should.fail', '');
+        });
     });
 
     it('should support promises', () => {
@@ -188,7 +192,7 @@ describe('RefreshTokenGrantType integration', () => {
       const request = new Request({
         body: { refresh_token: 'foobar' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -220,7 +224,7 @@ describe('RefreshTokenGrantType integration', () => {
       const request = new Request({
         body: { refresh_token: 'foobar' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -252,7 +256,7 @@ describe('RefreshTokenGrantType integration', () => {
       const request = new Request({
         body: { refresh_token: 'foobar' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -275,7 +279,7 @@ describe('RefreshTokenGrantType integration', () => {
       const request = new Request({
         body: {},
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -305,13 +309,15 @@ describe('RefreshTokenGrantType integration', () => {
       const request = new Request({
         body: { refresh_token: '12345' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
       return grantType
         .getRefreshToken(request, client)
-        .then(() => should.fail('should.fail', ''))
+        .then(() => {
+          should.fail('should.fail', '');
+        })
         .catch(e => {
           e.should.be.an.instanceOf(InvalidGrantError);
           e.message.should.equal('Invalid grant: refresh token is invalid');
@@ -334,13 +340,15 @@ describe('RefreshTokenGrantType integration', () => {
       const request = new Request({
         body: { refresh_token: 12345 },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
       return grantType
         .getRefreshToken(request, client)
-        .then(() => should.fail('should.fail', ''))
+        .then(() => {
+          should.fail('should.fail', '');
+        })
         .catch(e => {
           e.should.be.an.instanceOf(ServerError);
           e.message.should.equal(
@@ -365,13 +373,15 @@ describe('RefreshTokenGrantType integration', () => {
       const request = new Request({
         body: { refresh_token: 12345 },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
       return grantType
         .getRefreshToken(request, client)
-        .then(() => should.fail('should.fail', ''))
+        .then(() => {
+          should.fail('should.fail', '');
+        })
         .catch(e => {
           e.should.be.an.instanceOf(ServerError);
           e.message.should.equal(
@@ -396,13 +406,15 @@ describe('RefreshTokenGrantType integration', () => {
       const request = new Request({
         body: { refresh_token: 12345 },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
       return grantType
         .getRefreshToken(request, client)
-        .then(() => should.fail('should.fail', ''))
+        .then(() => {
+          should.fail('should.fail', '');
+        })
         .catch(e => {
           e.should.be.an.instanceOf(InvalidGrantError);
           e.message.should.equal('Invalid grant: refresh token is invalid');
@@ -425,7 +437,7 @@ describe('RefreshTokenGrantType integration', () => {
       const request = new Request({
         body: { refresh_token: 'øå€£‰' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -455,13 +467,15 @@ describe('RefreshTokenGrantType integration', () => {
       const request = new Request({
         body: { refresh_token: 12345 },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
       return grantType
         .getRefreshToken(request, client)
-        .then(() => should.fail('should.fail', ''))
+        .then(() => {
+          should.fail('should.fail', '');
+        })
         .catch(e => {
           e.should.be.an.instanceOf(InvalidGrantError);
           e.message.should.equal('Invalid grant: refresh token is invalid');
@@ -490,13 +504,15 @@ describe('RefreshTokenGrantType integration', () => {
       const request = new Request({
         body: { refresh_token: 12345 },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
       return grantType
         .getRefreshToken(request, client)
-        .then(() => should.fail('should.fail', ''))
+        .then(() => {
+          should.fail('should.fail', '');
+        })
         .catch(e => {
           e.should.be.an.instanceOf(InvalidGrantError);
           e.message.should.equal('Invalid grant: refresh token has expired');
@@ -524,13 +540,15 @@ describe('RefreshTokenGrantType integration', () => {
       const request = new Request({
         body: { refresh_token: 12345 },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
       return grantType
         .getRefreshToken(request, client)
-        .then(() => should.fail('should.fail', ''))
+        .then(() => {
+          should.fail('should.fail', '');
+        })
         .catch(e => {
           e.should.be.an.instanceOf(ServerError);
           e.message.should.equal(
@@ -556,7 +574,7 @@ describe('RefreshTokenGrantType integration', () => {
       const request = new Request({
         body: { refresh_token: 'foobar' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -565,7 +583,9 @@ describe('RefreshTokenGrantType integration', () => {
         .then(data => {
           data.should.equal(token);
         })
-        .catch(() => should.fail('should.fail', ''));
+        .catch(() => {
+          should.fail('should.fail', '');
+        });
     });
 
     it('should support promises', () => {
@@ -585,7 +605,7 @@ describe('RefreshTokenGrantType integration', () => {
       const request = new Request({
         body: { refresh_token: 'foobar' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -611,7 +631,7 @@ describe('RefreshTokenGrantType integration', () => {
       const request = new Request({
         body: { refresh_token: 'foobar' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -637,7 +657,7 @@ describe('RefreshTokenGrantType integration', () => {
     //   const request = new Request({
     //     body: { refresh_token: 'foobar' },
     //     headers: {},
-    //     method: {},
+    //     method: 'ANY',
     //     query: {},
     //   });
 
@@ -661,7 +681,9 @@ describe('RefreshTokenGrantType integration', () => {
 
       grantType
         .revokeToken({} as any)
-        .then(() => should.fail('should.fail', ''))
+        .then(() => {
+          should.fail('should.fail', '');
+        })
         .catch(e => {
           e.should.be.an.instanceOf(InvalidGrantError);
           e.message.should.equal('Invalid grant: refresh token is invalid');
@@ -692,7 +714,9 @@ describe('RefreshTokenGrantType integration', () => {
         .then(data => {
           data.should.equal(token);
         })
-        .catch(() => should.fail('should.fail', ''));
+        .catch(() => {
+          should.fail('should.fail', '');
+        });
     });
 
     it('should support promises', () => {

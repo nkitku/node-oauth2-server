@@ -1,6 +1,6 @@
 import * as should from 'should';
-import { InvalidArgumentError } from '../../../lib/errors/invalid-argument-error';
-import { AbstractGrantType } from '../../../lib/grant-types/abstract-grant-type';
+import { InvalidArgumentError } from '../../../lib/errors';
+import { AbstractGrantType } from '../../../lib/grant-types';
 import { Request } from '../../../lib/request';
 /**
  * Test `AbstractGrantType` integration.
@@ -183,7 +183,7 @@ describe('AbstractGrantType integration', () => {
       const request = new Request({
         body: { scope: 'øå€£‰' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -205,7 +205,7 @@ describe('AbstractGrantType integration', () => {
       const request = new Request({
         body: {},
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -221,7 +221,7 @@ describe('AbstractGrantType integration', () => {
       const request = new Request({
         body: { scope: 'foo' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 

@@ -1,5 +1,6 @@
+import { isUndefined } from 'lodash';
 import * as should from 'should';
-import { InvalidArgumentError } from '../../lib/errors/invalid-argument-error';
+import { InvalidArgumentError } from '../../lib/errors';
 import { Request } from '../../lib/request';
 
 /**
@@ -10,7 +11,7 @@ describe('Request integration', () => {
   describe('constructor()', () => {
     it('should throw an error if `headers` is missing', () => {
       try {
-        new Request({ body: {} });
+        new Request({ body: {} } as any);
 
         should.fail('should.fail', '');
       } catch (e) {
@@ -21,7 +22,7 @@ describe('Request integration', () => {
 
     it('should throw an error if `method` is missing', () => {
       try {
-        new Request({ body: {}, headers: {} });
+        new Request({ body: {}, headers: {} } as any);
 
         should.fail('should.fail', '');
       } catch (e) {
@@ -32,7 +33,7 @@ describe('Request integration', () => {
 
     it('should throw an error if `query` is missing', () => {
       try {
-        new Request({ body: {}, headers: {}, method: {} });
+        new Request({ body: {}, headers: {}, method: 'ANY' } as any);
 
         should.fail('should.fail', '');
       } catch (e) {
@@ -45,7 +46,7 @@ describe('Request integration', () => {
       const request = new Request({
         body: 'foo',
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -56,7 +57,7 @@ describe('Request integration', () => {
       const request = new Request({
         body: {},
         headers: { foo: 'bar', QuX: 'biz' },
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -71,14 +72,14 @@ describe('Request integration', () => {
         query: {},
       });
 
-      request.method.should.equal('biz');
+      request.method.should.equal('BIZ');
     });
 
     it('should set the `query`', () => {
       const request = new Request({
         body: {},
         headers: {},
-        method: {},
+        method: 'ANY',
         query: 'baz',
       });
 
@@ -91,11 +92,11 @@ describe('Request integration', () => {
       const request = new Request({
         body: {},
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
-      (request.get('content-type') === undefined).should.be.true();
+      isUndefined(request.get('content-type')).should.be.true();
     });
 
     it('should return the value if the field exists', () => {
@@ -104,7 +105,7 @@ describe('Request integration', () => {
         headers: {
           'content-type': 'text/html; charset=utf-8',
         },
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -120,7 +121,7 @@ describe('Request integration', () => {
           'content-type': 'application/json',
           'transfer-encoding': 'chunked',
         },
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -134,7 +135,7 @@ describe('Request integration', () => {
           'content-type': 'application/json',
           'transfer-encoding': 'chunked',
         },
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -148,7 +149,7 @@ describe('Request integration', () => {
           'content-type': 'text/html; charset=utf-8',
           'transfer-encoding': 'chunked',
         },
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -162,7 +163,7 @@ describe('Request integration', () => {
           'content-type': 'text/html; charset=utf-8',
           'transfer-encoding': 'chunked',
         },
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -173,7 +174,7 @@ describe('Request integration', () => {
       const request = new Request({
         body: {},
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 

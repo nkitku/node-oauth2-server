@@ -1,5 +1,35 @@
 ## Changelog
 
+### 5.0.0
+* BREAKING: Remove support for node v6
+* BREAKING: Remove support for callbacks only support native Promises
+* new: Rewrote in Typescript
+* new: Switch from Eslint to Tslint
+* new: added .vscode folder for recommend extensions and recommend setting required for development
+* new: added suitable Typescript Interfaces for various Objects
+
+### 4.0.0
+* BREAKING: Set server_error Code to 500
+* BREAKING: Remove support for node v4
+* new: Added revoke-handler to revoke access token
+* new: Added implicit grant flow
+* new: Switch from jshint to eslin
+* fix: authorization_code grant should not be required in implicit flowt
+
+### 3.1.0
+* new: Added package-lock.json
+* new: Extend model object with request context
+* new: .npmignore tests
+* fix: validate requested scope on authorize request
+* fix: issue correct expiry dates for tokens
+* fix: set numArgs for promisify of generateAuthorizationCode
+* fix: Changed 'hasOwnProperty' call in Response
+* docs: Ensure accessTokenExpiresAt is required
+* docs: Add missing notice of breaking change for accessExpireLifetime to migration guide
+* docs: Correct tokens time scale for 2.x to 3.x  migration guide
+* readme: Update Slack badge and link
+* readme: Fix link to RFC6750 standard
+
 ### 3.0.1
 * Updated dependencies
 

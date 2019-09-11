@@ -1,13 +1,13 @@
-import { InvalidArgumentError } from '../errors/invalid-argument-error';
-import { InvalidGrantError } from '../errors/invalid-grant-error';
-import { InvalidRequestError } from '../errors/invalid-request-error';
-import { ServerError } from '../errors/server-error';
-import { Client } from '../interfaces/client.interface';
-import { Token } from '../interfaces/token.interface';
-import { User } from '../interfaces/user.interface';
+import { AbstractGrantType } from '.';
+import {
+  InvalidArgumentError,
+  InvalidGrantError,
+  InvalidRequestError,
+  ServerError,
+} from '../errors';
+import { AuthorizationCode, Client, Token, User } from '../interfaces';
 import { Request } from '../request';
 import * as is from '../validator/is';
-import { AbstractGrantType } from './abstract-grant-type';
 
 export class AuthorizationCodeGrantType extends AbstractGrantType {
   constructor(options: any = {}) {
@@ -41,7 +41,7 @@ export class AuthorizationCodeGrantType extends AbstractGrantType {
    * @see https://tools.ietf.org/html/rfc6749#section-4.1.3
    */
 
-  async handle(request: Request, client) {
+  async handle(request: Request, client: Client) {
     if (!request) {
       throw new InvalidArgumentError('Missing parameter: `request`');
     }
@@ -65,7 +65,7 @@ export class AuthorizationCodeGrantType extends AbstractGrantType {
    * Get the authorization code.
    */
 
-  async getAuthorizationCode(request: Request, client) {
+  async getAuthorizationCode(request: Request, client: Client) {
     if (!request.body.code) {
       throw new InvalidRequestError('Missing parameter: `code`');
     }
@@ -105,7 +105,7 @@ export class AuthorizationCodeGrantType extends AbstractGrantType {
       );
     }
 
-    if (code.expiresAt < new Date()) {
+    if (code.expiresAt.getTime() < Date.now()) {
       throw new InvalidGrantError(
         'Invalid grant: authorization code has expired',
       );
@@ -131,7 +131,7 @@ export class AuthorizationCodeGrantType extends AbstractGrantType {
    * @see https://tools.ietf.org/html/rfc6749#section-4.1.3
    */
 
-  validateRedirectUri = (request: Request, code) => {
+  validateRedirectUri(request: Request, code: AuthorizationCode) {
     if (!code.redirectUri) {
       return;
     }
@@ -149,7 +149,7 @@ export class AuthorizationCodeGrantType extends AbstractGrantType {
         'Invalid request: `redirect_uri` is invalid',
       );
     }
-  };
+  }
 
   /**
    * Revoke the authorization code.
@@ -161,7 +161,7 @@ export class AuthorizationCodeGrantType extends AbstractGrantType {
    * @see https://tools.ietf.org/html/rfc6749#section-4.1.2
    */
 
-  async revokeAuthorizationCode(code) {
+  async revokeAuthorizationCode(code: AuthorizationCode) {
     const status = await this.model.revokeAuthorizationCode(code);
     if (!status) {
       throw new InvalidGrantError(
@@ -182,21 +182,11 @@ export class AuthorizationCodeGrantType extends AbstractGrantType {
     authorizationCode: string,
     scope: string,
   ) {
-    const fns = [
-      this.validateScope(user, client, scope),
-      this.generateAccessToken(client, user, scope),
-      this.generateRefreshToken(client, user, scope),
-      this.getAccessTokenExpiresAt(),
-      this.getRefreshTokenExpiresAt(),
-    ];
-
-    const [
-      accessScope,
-      accessToken,
-      refreshToken,
-      accessTokenExpiresAt,
-      refreshTokenExpiresAt,
-    ] = await Promise.all(fns as any);
+    const accessScope = await this.validateScope(user, client, scope);
+    const accessToken = await this.generateAccessToken(client, user, scope);
+    const refreshToken = await this.generateRefreshToken(client, user, scope);
+    const accessTokenExpiresAt = this.getAccessTokenExpiresAt();
+    const refreshTokenExpiresAt = this.getRefreshTokenExpiresAt();
 
     const token: Token = {
       accessToken,

@@ -1,7 +1,7 @@
 import * as should from 'should';
 import * as sinon from 'sinon';
-import { ServerError } from '../../../lib/errors/server-error';
-import { AuthenticateHandler } from '../../../lib/handlers/authenticate-handler';
+import { ServerError } from '../../../lib/errors';
+import { AuthenticateHandler } from '../../../lib/handlers';
 import { Request } from '../../../lib/request';
 
 /**
@@ -18,7 +18,7 @@ describe('AuthenticateHandler', () => {
         const request = new Request({
           body: {},
           headers: { Authorization: 'Bearer foo' },
-          method: {},
+          method: 'ANY',
           query: {},
         });
 
@@ -42,7 +42,7 @@ describe('AuthenticateHandler', () => {
         const request = new Request({
           body: {},
           headers: {},
-          method: {},
+          method: 'ANY',
           query: { access_token: 'foo' },
         });
 
@@ -66,7 +66,7 @@ describe('AuthenticateHandler', () => {
         const request = new Request({
           body: { access_token: 'foo' },
           headers: {},
-          method: {},
+          method: 'ANY',
           query: {},
         });
 
@@ -103,7 +103,7 @@ describe('AuthenticateHandler', () => {
   });
 
   describe('validateAccessToken()', () => {
-    it('should fail if token has no valid `accessTokenExpiresAt` date', async () => {
+    it('should fail if token has no valid `accessTokenExpiresAt` date', () => {
       const model = {
         getAccessToken() {},
       };
@@ -111,7 +111,7 @@ describe('AuthenticateHandler', () => {
 
       let failed = false;
       try {
-        await handler.validateAccessToken({
+        handler.validateAccessToken({
           user: {},
         } as any);
       } catch (err) {

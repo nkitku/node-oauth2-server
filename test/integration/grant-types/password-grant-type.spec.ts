@@ -1,8 +1,10 @@
 import * as should from 'should';
-import { InvalidArgumentError } from '../../../lib/errors/invalid-argument-error';
-import { InvalidGrantError } from '../../../lib/errors/invalid-grant-error';
-import { InvalidRequestError } from '../../../lib/errors/invalid-request-error';
-import { PasswordGrantType } from '../../../lib/grant-types/password-grant-type';
+import {
+  InvalidArgumentError,
+  InvalidGrantError,
+  InvalidRequestError,
+} from '../../../lib/errors';
+import { PasswordGrantType } from '../../../lib/grant-types';
 import { Request } from '../../../lib/request';
 
 /**
@@ -115,7 +117,7 @@ describe('PasswordGrantType integration', () => {
       const request = new Request({
         body: { username: 'foo', password: 'bar', scope: 'baz' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -124,7 +126,9 @@ describe('PasswordGrantType integration', () => {
         .then(data => {
           data.should.equal(token);
         })
-        .catch(() => should.fail('should.fail', ''));
+        .catch(() => {
+          should.fail('should.fail', '');
+        });
     });
 
     it('should support promises', () => {
@@ -145,7 +149,7 @@ describe('PasswordGrantType integration', () => {
       const request = new Request({
         body: { username: 'foo', password: 'bar' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -170,7 +174,7 @@ describe('PasswordGrantType integration', () => {
       const request = new Request({
         body: { username: 'foo', password: 'bar' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -195,7 +199,7 @@ describe('PasswordGrantType integration', () => {
       const request = new Request({
         body: { username: 'foo', password: 'bar' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -216,7 +220,7 @@ describe('PasswordGrantType integration', () => {
       const request = new Request({
         body: {},
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -242,7 +246,7 @@ describe('PasswordGrantType integration', () => {
       const request = new Request({
         body: { username: 'foo' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -268,7 +272,7 @@ describe('PasswordGrantType integration', () => {
       const request = new Request({
         body: { username: '\r\n', password: 'foobar' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -294,7 +298,7 @@ describe('PasswordGrantType integration', () => {
       const request = new Request({
         body: { username: 'foobar', password: '\r\n' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -320,7 +324,7 @@ describe('PasswordGrantType integration', () => {
       const request = new Request({
         body: { username: 'foo', password: 'bar' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
       try {
@@ -347,7 +351,7 @@ describe('PasswordGrantType integration', () => {
       const request = new Request({
         body: { username: 'foo', password: 'bar' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
       try {
@@ -373,7 +377,7 @@ describe('PasswordGrantType integration', () => {
       const request = new Request({
         body: { username: 'foo', password: 'bar' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -395,7 +399,7 @@ describe('PasswordGrantType integration', () => {
       const request = new Request({
         body: { username: 'foo', password: 'bar' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -417,7 +421,7 @@ describe('PasswordGrantType integration', () => {
       const request = new Request({
         body: { username: 'foo', password: 'bar' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 

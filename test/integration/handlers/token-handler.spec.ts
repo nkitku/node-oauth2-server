@@ -1,17 +1,19 @@
 import * as should from 'should';
 import * as util from 'util';
-import { AccessDeniedError } from '../../../lib/errors/access-denied-error';
-import { InvalidArgumentError } from '../../../lib/errors/invalid-argument-error';
-import { InvalidClientError } from '../../../lib/errors/invalid-client-error';
-import { InvalidRequestError } from '../../../lib/errors/invalid-request-error';
-import { ServerError } from '../../../lib/errors/server-error';
-import { UnauthorizedClientError } from '../../../lib/errors/unauthorized-client-error';
-import { UnsupportedGrantTypeError } from '../../../lib/errors/unsupported-grant-type-error';
-import { PasswordGrantType } from '../../../lib/grant-types/password-grant-type';
-import { TokenHandler } from '../../../lib/handlers/token-handler';
+import {
+  AccessDeniedError,
+  InvalidArgumentError,
+  InvalidClientError,
+  InvalidRequestError,
+  ServerError,
+  UnauthorizedClientError,
+  UnsupportedGrantTypeError,
+} from '../../../lib/errors';
+import { PasswordGrantType } from '../../../lib/grant-types';
+import { TokenHandler } from '../../../lib/handlers';
 import { Request } from '../../../lib/request';
 import { Response } from '../../../lib/response';
-import { BearerTokenType } from '../../../lib/token-types/bearer-token-type';
+import { BearerTokenType } from '../../../lib/token-types';
 
 /**
  * Test `TokenHandler` integration.
@@ -217,7 +219,7 @@ describe('TokenHandler integration', () => {
       const request = new Request({
         body: {},
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -409,7 +411,7 @@ describe('TokenHandler integration', () => {
             error: 'server_error',
             error_description: 'Unhandled exception',
           });
-          response.status.should.equal(503);
+          response.status.should.equal(500);
         });
     });
 
@@ -525,7 +527,7 @@ describe('TokenHandler integration', () => {
         });
     });
 
-    it('should return custom attributes in a bearer token if the allowExtendedTokenAttributes is set', () => {
+    it('should return custom attributes in a bearer token if the allowExtendedTokenAttributes is set', async () => {
       const token = {
         accessToken: 'foo',
         client: {},
@@ -572,18 +574,12 @@ describe('TokenHandler integration', () => {
       });
       const response = new Response({ body: {}, headers: {} });
 
-      return handler
-        .handle(request, response)
-        .then(() => {
-          should.exist(response.body.access_token);
-          should.exist(response.body.refresh_token);
-          should.exist(response.body.token_type);
-          should.exist(response.body.scope);
-          should.exist(response.body.foo);
-        })
-        .catch(() => {
-          should.fail('should.fail', '');
-        });
+      await handler.handle(request, response);
+      should.exist(response.body.access_token);
+      should.exist(response.body.refresh_token);
+      should.exist(response.body.token_type);
+      should.exist(response.body.scope);
+      should.exist(response.body.foo);
     });
   });
 
@@ -601,7 +597,7 @@ describe('TokenHandler integration', () => {
       const request = new Request({
         body: { client_id: 'øå€£‰', client_secret: 'foo' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -628,7 +624,7 @@ describe('TokenHandler integration', () => {
       const request = new Request({
         body: { client_id: 'foo', client_secret: 'øå€£‰' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -655,7 +651,7 @@ describe('TokenHandler integration', () => {
       const request = new Request({
         body: { client_id: 12345, client_secret: 'secret' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -685,7 +681,7 @@ describe('TokenHandler integration', () => {
       const request = new Request({
         body: { client_id: 12345, client_secret: 'secret' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -715,7 +711,7 @@ describe('TokenHandler integration', () => {
       const request = new Request({
         body: { client_id: 12345, client_secret: 'secret' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
       try {
@@ -745,7 +741,7 @@ describe('TokenHandler integration', () => {
             Buffer.from('foo:bar').toString('base64'),
           ),
         },
-        method: {},
+        method: 'ANY',
         query: {},
       });
       const response = new Response({ body: {}, headers: {} });
@@ -782,7 +778,7 @@ describe('TokenHandler integration', () => {
       const request = new Request({
         body: { client_id: 12345, client_secret: 'secret' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
       try {
@@ -800,7 +796,7 @@ describe('TokenHandler integration', () => {
           async getClient() {
             return client;
           },
-          async saveToken() {},
+          saveToken() {},
         };
 
         const handler = new TokenHandler({
@@ -814,7 +810,7 @@ describe('TokenHandler integration', () => {
         const request = new Request({
           body: { client_id: 'blah', grant_type: 'password' },
           headers: {},
-          method: {},
+          method: 'ANY',
           query: {},
         });
 
@@ -836,7 +832,7 @@ describe('TokenHandler integration', () => {
           async getClient() {
             return client;
           },
-          async saveToken() {},
+          saveToken() {},
         };
 
         const handler = new TokenHandler({
@@ -855,7 +851,7 @@ describe('TokenHandler integration', () => {
               Buffer.from('blah:').toString('base64'),
             ),
           },
-          method: {},
+          method: 'ANY',
           query: {},
         });
 
@@ -885,7 +881,7 @@ describe('TokenHandler integration', () => {
       const request = new Request({
         body: { client_id: 12345, client_secret: 'secret' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -907,7 +903,7 @@ describe('TokenHandler integration', () => {
       const request = new Request({
         body: { client_id: 12345, client_secret: 'secret' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -929,7 +925,7 @@ describe('TokenHandler integration', () => {
       const request = new Request({
         body: { client_id: 12345, client_secret: 'secret' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -951,7 +947,7 @@ describe('TokenHandler integration', () => {
       const request = new Request({
         body: { client_secret: 'foo' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -980,7 +976,7 @@ describe('TokenHandler integration', () => {
       const request = new Request({
         body: { client_id: 'foo' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -1011,7 +1007,7 @@ describe('TokenHandler integration', () => {
         const request = new Request({
           body: { client_id: 'foo', grant_type: 'password' },
           headers: {},
-          method: {},
+          method: 'ANY',
           query: {},
         });
         const credentials = handler.getClientCredentials(request);
@@ -1039,7 +1035,7 @@ describe('TokenHandler integration', () => {
               Buffer.from('foo:bar').toString('base64'),
             ),
           },
-          method: {},
+          method: 'ANY',
           query: {},
         });
         const credentials = handler.getClientCredentials(request);
@@ -1062,7 +1058,7 @@ describe('TokenHandler integration', () => {
         const request = new Request({
           body: { client_id: 'foo', client_secret: 'bar' },
           headers: {},
-          method: {},
+          method: 'ANY',
           query: {},
         });
         const credentials = handler.getClientCredentials(request);
@@ -1086,7 +1082,7 @@ describe('TokenHandler integration', () => {
       const request = new Request({
         body: {},
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -1113,7 +1109,7 @@ describe('TokenHandler integration', () => {
       const request = new Request({
         body: { grant_type: '~foo~' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -1139,7 +1135,7 @@ describe('TokenHandler integration', () => {
       const request = new Request({
         body: { grant_type: 'foobar' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -1156,7 +1152,7 @@ describe('TokenHandler integration', () => {
     });
 
     it('should throw an error if `grant_type` is unauthorized', async () => {
-      const client = { grants: ['client_credentials'] };
+      const client: any = { grants: ['client_credentials'] };
       const model = {
         getClient() {},
         saveToken() {},
@@ -1169,7 +1165,7 @@ describe('TokenHandler integration', () => {
       const request = new Request({
         body: { grant_type: 'password' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -1201,7 +1197,7 @@ describe('TokenHandler integration', () => {
       const request = new Request({
         body: { grant_type: 'password', username: 'foo', password: 'bar' },
         headers: {},
-        method: {},
+        method: 'ANY',
         query: {},
       });
 
@@ -1216,7 +1212,7 @@ describe('TokenHandler integration', () => {
 
     describe('with grant_type `authorization_code`', () => {
       it('should return a token', () => {
-        const client = { id: 'foobar', grants: ['authorization_code'] };
+        const client: any = { id: 'foobar', grants: ['authorization_code'] };
         const token = {};
         const model = {
           getAuthorizationCode() {
@@ -1254,24 +1250,22 @@ describe('TokenHandler integration', () => {
             grant_type: 'authorization_code',
           },
           headers: {},
-          method: {},
+          method: 'ANY',
           query: {},
         });
 
-        return handler
-          .handleGrantType(request, client)
-          .then(data => {
-            data.should.equal(token);
-          })
-          .catch(() => {
-            should.fail('should.fail', '');
-          });
+        return handler.handleGrantType(request, client).then(data => {
+          data.should.equal(token);
+        });
+        // .catch(() => {
+        //   should.fail('should.fail', '');
+        // });
       });
     });
 
     describe('with grant_type `client_credentials`', () => {
       it('should return a token', () => {
-        const client = { grants: ['client_credentials'] };
+        const client: any = { grants: ['client_credentials'] };
         const token = {};
         const model = {
           getClient() {},
@@ -1296,7 +1290,7 @@ describe('TokenHandler integration', () => {
             scope: 'foo',
           },
           headers: {},
-          method: {},
+          method: 'ANY',
           query: {},
         });
 
@@ -1313,7 +1307,7 @@ describe('TokenHandler integration', () => {
 
     describe('with grant_type `password`', () => {
       it('should return a token', () => {
-        const client = { grants: ['password'] };
+        const client: any = { grants: ['password'] };
         const token = {};
         const model = {
           getClient() {},
@@ -1342,7 +1336,7 @@ describe('TokenHandler integration', () => {
             scope: 'baz',
           },
           headers: {},
-          method: {},
+          method: 'ANY',
           query: {},
         });
 
@@ -1359,7 +1353,7 @@ describe('TokenHandler integration', () => {
 
     describe('with grant_type `refresh_token`', () => {
       it('should return a token', () => {
-        const client = { grants: ['refresh_token'] };
+        const client: any = { grants: ['refresh_token'] };
         const token = { accessToken: 'foo', client: {}, user: {} };
         const model = {
           getClient() {},
@@ -1394,7 +1388,7 @@ describe('TokenHandler integration', () => {
             refresh_token: 12345,
           },
           headers: {},
-          method: {},
+          method: 'ANY',
           query: {},
         });
 
@@ -1411,7 +1405,7 @@ describe('TokenHandler integration', () => {
 
     describe('with custom grant_type', () => {
       it('should return a token', () => {
-        const client = {
+        const client: any = {
           grants: ['urn:ietf:params:oauth:grant-type:saml2-bearer'],
         };
         const token = {};
@@ -1442,7 +1436,7 @@ describe('TokenHandler integration', () => {
             password: 'bar',
           },
           headers: {},
-          method: {},
+          method: 'ANY',
           query: {},
         });
 
@@ -1460,7 +1454,7 @@ describe('TokenHandler integration', () => {
 
   describe('getAccessTokenLifetime()', () => {
     it('should return the client access token lifetime', () => {
-      const client = { accessTokenLifetime: 60 };
+      const client: any = { accessTokenLifetime: 60 };
       const model = {
         getClient() {
           return client;
@@ -1477,7 +1471,7 @@ describe('TokenHandler integration', () => {
     });
 
     it('should return the default access token lifetime', () => {
-      const client = {};
+      const client: any = {};
       const model = {
         getClient() {
           return client;
@@ -1496,7 +1490,7 @@ describe('TokenHandler integration', () => {
 
   describe('getRefreshTokenLifetime()', () => {
     it('should return the client access token lifetime', () => {
-      const client = { refreshTokenLifetime: 60 };
+      const client: any = { refreshTokenLifetime: 60 };
       const model = {
         getClient() {
           return client;
@@ -1513,7 +1507,7 @@ describe('TokenHandler integration', () => {
     });
 
     it('should return the default access token lifetime', () => {
-      const client = {};
+      const client: any = {};
       const model = {
         getClient() {
           return client;

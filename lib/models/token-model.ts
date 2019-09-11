@@ -1,7 +1,7 @@
-import { InvalidArgumentError } from '../errors/invalid-argument-error';
-import { Client } from '../interfaces/client.interface';
-import { Token } from '../interfaces/token.interface';
-import { User } from '../interfaces/user.interface';
+import { MILLISECONDS_PER_SECOND } from '../constants';
+import { InvalidArgumentError } from '../errors';
+import { Client, Token, User } from '../interfaces';
+import { hasOwnProperty } from '../utils/fn';
 
 const modelAttributes = [
   'accessToken',
@@ -65,16 +65,17 @@ export class TokenModel implements Token {
     if (options && options.allowExtendedTokenAttributes) {
       this.customAttributes = {};
 
-      for (const key in data) {
-        if (data.hasOwnProperty(key) && modelAttributes.indexOf(key) < 0) {
+      for (const key of Object.keys(data)) {
+        if (hasOwnProperty(data, key) && modelAttributes.indexOf(key) < 0) {
           this.customAttributes[key] = data[key];
         }
       }
     }
-    const msInS = 1000;
+
     if (this.accessTokenExpiresAt) {
       this.accessTokenLifetime = Math.floor(
-        (this.accessTokenExpiresAt.getTime() - new Date().getTime()) / msInS,
+        (this.accessTokenExpiresAt.getTime() - new Date().getTime()) /
+          MILLISECONDS_PER_SECOND,
       );
     }
   }

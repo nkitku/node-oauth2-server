@@ -2,22 +2,19 @@
 # IDE
 /.idea
 /.awcache
-/.vscode
+/.vscode/*.code-workspace
+/.vscode/settings.json
 
 # misc
 npm-debug.log
-
-# example
-/quick-start
-
-# tests
-# /test
-
-# dist
+# folders
 /dist
 /node_modules
+docs/_build/
+__pycache__/
 
+# files
 .DS_Store
-# conf
 
+*.pyc
 /aio
