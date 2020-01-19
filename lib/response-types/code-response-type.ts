@@ -3,10 +3,14 @@ import { InvalidArgumentError } from '../errors';
 import { AuthorizationCode, Client, Model, User } from '../interfaces';
 import { Request } from '../request';
 import * as tokenUtil from '../utils/token-util';
+// eslint-disable-next-line import/prefer-default-export
 export class CodeResponseType {
   code: any;
+
   authorizationCodeLifetime: number;
+
   model: Model;
+
   constructor(options: any = {}) {
     if (!options.authorizationCodeLifetime) {
       throw new InvalidArgumentError(
@@ -148,6 +152,7 @@ export class CodeResponseType {
    * Set redirect uri parameter.
    */
 
+  // eslint-disable-next-line class-methods-use-this
   setRedirectUriParam(redirectUri: any, key: string, value: string) {
     if (!redirectUri) {
       throw new InvalidArgumentError('Missing parameter: `redirectUri`');

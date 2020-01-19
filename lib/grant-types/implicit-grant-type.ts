@@ -3,9 +3,12 @@ import { InvalidArgumentError } from '../errors';
 import { Client, Token, User } from '../interfaces';
 import { Request } from '../request';
 
+// eslint-disable-next-line import/prefer-default-export
 export class ImplicitGrantType extends AbstractGrantType {
   scope: string;
+
   user: User;
+
   constructor(options: any = {}) {
     super(options);
 
@@ -47,7 +50,7 @@ export class ImplicitGrantType extends AbstractGrantType {
    * Save token.
    */
 
-  async saveToken(user: User, client: Client, scope: string) {
+  async saveToken(user: User, client: Client, scope: string | undefined) {
     const validatedScope = await this.validateScope(user, client, scope);
     const accessToken = await this.generateAccessToken(client, user, scope);
     const accessTokenExpiresAt = this.getAccessTokenExpiresAt();

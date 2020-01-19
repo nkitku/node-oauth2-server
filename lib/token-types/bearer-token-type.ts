@@ -1,17 +1,23 @@
 import { InvalidArgumentError } from '../errors';
 import { hasOwnProperty } from '../utils/fn';
 
+// eslint-disable-next-line import/prefer-default-export
 export class BearerTokenType {
   accessToken: string;
-  accessTokenLifetime: number;
-  refreshToken: string;
-  scope: string;
+
+  accessTokenLifetime: number | undefined;
+
+  refreshToken: string | undefined;
+
+  scope: string | undefined;
+
   customAttributes: any;
+
   constructor(
     accessToken: string,
-    accessTokenLifetime: number,
-    refreshToken: string,
-    scope: string,
+    accessTokenLifetime: number | undefined,
+    refreshToken: string | undefined,
+    scope: string | undefined,
     customAttributes: any,
   ) {
     if (!accessToken) {
@@ -22,10 +28,7 @@ export class BearerTokenType {
     this.accessTokenLifetime = accessTokenLifetime;
     this.refreshToken = refreshToken;
     this.scope = scope;
-
-    if (customAttributes) {
-      this.customAttributes = customAttributes;
-    }
+    this.customAttributes = customAttributes;
   }
 
   /**

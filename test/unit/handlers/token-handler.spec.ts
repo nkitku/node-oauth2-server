@@ -2,6 +2,7 @@ import * as should from 'should';
 import * as sinon from 'sinon';
 import { TokenHandler } from '../../../lib/handlers';
 import { Request } from '../../../lib/request';
+import { Response } from '../../../lib/response';
 
 /**
  * Test `TokenHandler`.
@@ -29,7 +30,7 @@ describe('TokenHandler', () => {
       });
 
       return handler
-        .getClient(request, {})
+        .getClient(request, new Response())
         .then(() => {
           model.getClient.callCount.should.equal(1);
           model.getClient.firstCall.args.should.have.length(2);

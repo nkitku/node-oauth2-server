@@ -36,6 +36,7 @@ describe('AuthorizeHandler integration', () => {
 
     it('should throw an error if `options.model` is missing', () => {
       try {
+        // eslint-disable-next-line no-new
         new AuthorizeHandler({ authorizationCodeLifetime: 120 });
 
         should.fail('should.fail', '');
@@ -47,6 +48,7 @@ describe('AuthorizeHandler integration', () => {
 
     it('should throw an error if the model does not implement `getClient()`', () => {
       try {
+        // eslint-disable-next-line no-new
         new AuthorizeHandler({ authorizationCodeLifetime: 120, model: {} });
 
         should.fail('should.fail', '');
@@ -82,6 +84,7 @@ describe('AuthorizeHandler integration', () => {
       };
 
       try {
+        // eslint-disable-next-line no-new
         new AuthorizeHandler({ authorizationCodeLifetime: 120, model });
 
         should.fail('should.fail', '');
@@ -149,7 +152,10 @@ describe('AuthorizeHandler integration', () => {
       });
 
       try {
-        await handler.handle(undefined, undefined);
+        await handler.handle(
+          (undefined as unknown) as Request,
+          (undefined as unknown) as Response,
+        );
 
         should.fail('should.fail', '');
       } catch (e) {
@@ -178,7 +184,7 @@ describe('AuthorizeHandler integration', () => {
       });
 
       try {
-        await handler.handle(request, undefined);
+        await handler.handle(request, (undefined as unknown) as Response);
 
         should.fail('should.fail', '');
       } catch (e) {
@@ -1075,15 +1081,6 @@ describe('AuthorizeHandler integration', () => {
 
   describe('getScope()', () => {
     it('should throw an error if `scope` is invalid', () => {
-      const model = {
-        getAccessToken() {},
-        getClient() {},
-        saveAuthorizationCode() {},
-      };
-      const handler = new AuthorizeHandler({
-        authorizationCodeLifetime: 120,
-        model,
-      });
       const request = new Request({
         body: { scope: 'øå€£‰' },
         headers: {},
@@ -1092,7 +1089,7 @@ describe('AuthorizeHandler integration', () => {
       });
 
       try {
-        handler.getScope(request);
+        AuthorizeHandler.getScope(request);
 
         should.fail('should.fail', '');
       } catch (e) {
@@ -1103,15 +1100,6 @@ describe('AuthorizeHandler integration', () => {
 
     describe('with `scope` in the request body', () => {
       it('should return the scope', () => {
-        const model = {
-          getAccessToken() {},
-          getClient() {},
-          saveAuthorizationCode() {},
-        };
-        const handler = new AuthorizeHandler({
-          authorizationCodeLifetime: 120,
-          model,
-        });
         const request = new Request({
           body: { scope: 'foo' },
           headers: {},
@@ -1119,21 +1107,12 @@ describe('AuthorizeHandler integration', () => {
           query: {},
         });
 
-        handler.getScope(request).should.equal('foo');
+        AuthorizeHandler.getScope(request).should.equal('foo');
       });
     });
 
     describe('with `scope` in the request query', () => {
       it('should return the scope', () => {
-        const model = {
-          getAccessToken() {},
-          getClient() {},
-          saveAuthorizationCode() {},
-        };
-        const handler = new AuthorizeHandler({
-          authorizationCodeLifetime: 120,
-          model,
-        });
         const request = new Request({
           body: {},
           headers: {},
@@ -1141,7 +1120,7 @@ describe('AuthorizeHandler integration', () => {
           query: { scope: 'foo' },
         });
 
-        handler.getScope(request).should.equal('foo');
+        AuthorizeHandler.getScope(request).should.equal('foo');
       });
     });
   });
@@ -1513,21 +1492,12 @@ describe('AuthorizeHandler integration', () => {
 
   describe('buildSuccessRedirectUri()', () => {
     it('should return a redirect uri', () => {
-      const model = {
-        getAccessToken() {},
-        getClient() {},
-        saveAuthorizationCode() {},
-      };
-      const handler = new AuthorizeHandler({
-        authorizationCodeLifetime: 120,
-        model,
-      });
       const responseType = new CodeResponseType({
         authorizationCodeLifetime: 360,
         model: { saveAuthorizationCode: () => {} },
       });
       responseType.code = 12345;
-      const redirectUri = handler.buildSuccessRedirectUri(
+      const redirectUri = AuthorizeHandler.buildSuccessRedirectUri(
         'http://example.com/cb',
         responseType,
       );
@@ -1539,20 +1509,11 @@ describe('AuthorizeHandler integration', () => {
   describe('buildErrorRedirectUri()', () => {
     it('should set `error_description` if available', () => {
       const error = new InvalidClientError('foo bar');
-      const model = {
-        getAccessToken() {},
-        getClient() {},
-        saveAuthorizationCode() {},
-      };
-      const handler = new AuthorizeHandler({
-        authorizationCodeLifetime: 120,
-        model,
-      });
       const responseType = new CodeResponseType({
         authorizationCodeLifetime: 360,
         model: { saveAuthorizationCode: () => {} },
       });
-      const redirectUri = handler.buildErrorRedirectUri(
+      const redirectUri = AuthorizeHandler.buildErrorRedirectUri(
         'http://example.com/cb',
         responseType,
         error,
@@ -1567,20 +1528,11 @@ describe('AuthorizeHandler integration', () => {
 
     it('should return a redirect uri', () => {
       const error = new InvalidClientError();
-      const model = {
-        getAccessToken() {},
-        getClient() {},
-        saveAuthorizationCode() {},
-      };
-      const handler = new AuthorizeHandler({
-        authorizationCodeLifetime: 120,
-        model,
-      });
       const responseType = new CodeResponseType({
         authorizationCodeLifetime: 360,
         model: { saveAuthorizationCode: () => {} },
       });
-      const redirectUri = handler.buildErrorRedirectUri(
+      const redirectUri = AuthorizeHandler.buildErrorRedirectUri(
         'http://example.com/cb',
         responseType,
         error,
@@ -1596,15 +1548,6 @@ describe('AuthorizeHandler integration', () => {
 
   describe('updateResponse()', () => {
     it('should set the `location` header', () => {
-      const model = {
-        getAccessToken() {},
-        getClient() {},
-        saveAuthorizationCode() {},
-      };
-      const handler = new AuthorizeHandler({
-        authorizationCodeLifetime: 120,
-        model,
-      });
       const responseType = new CodeResponseType({
         authorizationCodeLifetime: 360,
         model: { saveAuthorizationCode: () => {} },
@@ -1612,7 +1555,7 @@ describe('AuthorizeHandler integration', () => {
       const response = new Response({ body: {}, headers: {} });
       const uri = url.parse('http://example.com/cb', true);
 
-      handler.updateResponse(response, uri, responseType, 'foobar');
+      AuthorizeHandler.updateResponse(response, uri, responseType, 'foobar');
 
       response
         .get('location')

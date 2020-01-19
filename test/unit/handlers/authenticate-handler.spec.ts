@@ -104,14 +104,9 @@ describe('AuthenticateHandler', () => {
 
   describe('validateAccessToken()', () => {
     it('should fail if token has no valid `accessTokenExpiresAt` date', () => {
-      const model = {
-        getAccessToken() {},
-      };
-      const handler = new AuthenticateHandler({ model });
-
       let failed = false;
       try {
-        handler.validateAccessToken({
+        AuthenticateHandler.validateAccessToken({
           user: {},
         } as any);
       } catch (err) {
@@ -122,12 +117,8 @@ describe('AuthenticateHandler', () => {
     });
 
     it('should succeed if token has valid `accessTokenExpiresAt` date', () => {
-      const model = {
-        getAccessToken() {},
-      };
-      const handler = new AuthenticateHandler({ model });
       try {
-        handler.validateAccessToken({
+        AuthenticateHandler.validateAccessToken({
           user: {},
           accessTokenExpiresAt: new Date(new Date().getTime() + 10000),
         } as any);

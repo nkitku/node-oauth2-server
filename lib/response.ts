@@ -1,9 +1,13 @@
 import { hasOwnProperty } from './utils/fn';
 
-export class Response {
+// eslint-disable-next-line import/prefer-default-export
+export class Response implements Record<string, any> {
   body: any;
-  headers: any;
+
+  headers: Record<string, any>;
+
   status: number;
+
   constructor(options: any = {}) {
     this.body = options.body || {};
     this.headers = {};
@@ -17,9 +21,10 @@ export class Response {
     }
 
     // Store additional properties of the response object passed in.
+    const me: Record<string, any> = this;
     for (const property of Object.keys(options)) {
-      if (hasOwnProperty(options, property) && !this[property]) {
-        this[property] = options[property];
+      if (hasOwnProperty(options, property) && !me[property]) {
+        me[property] = options[property];
       }
     }
   }

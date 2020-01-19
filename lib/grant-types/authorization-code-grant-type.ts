@@ -9,6 +9,7 @@ import { AuthorizationCode, Client, Token, User } from '../interfaces';
 import { Request } from '../request';
 import * as is from '../validator/is';
 
+// eslint-disable-next-line import/prefer-default-export
 export class AuthorizationCodeGrantType extends AbstractGrantType {
   constructor(options: any = {}) {
     super(options);
@@ -180,7 +181,7 @@ export class AuthorizationCodeGrantType extends AbstractGrantType {
     user: User,
     client: Client,
     authorizationCode: string,
-    scope: string,
+    scope: string | undefined,
   ) {
     const accessScope = await this.validateScope(user, client, scope);
     const accessToken = await this.generateAccessToken(client, user, scope);

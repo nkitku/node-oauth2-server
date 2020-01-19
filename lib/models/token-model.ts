@@ -13,16 +13,26 @@ const modelAttributes = [
   'user',
 ];
 
+// eslint-disable-next-line import/prefer-default-export
 export class TokenModel implements Token {
   accessToken: string;
+
   accessTokenExpiresAt?: Date;
+
   refreshToken?: string;
+
   refreshTokenExpiresAt?: Date;
+
   scope?: string;
+
   client: Client;
+
   user: User;
-  customAttributes: {};
-  accessTokenLifetime: number;
+
+  customAttributes?: Record<string, any>;
+
+  accessTokenLifetime?: number;
+
   constructor(data: any = {}, options: any = {}) {
     if (!data.accessToken) {
       throw new InvalidArgumentError('Missing parameter: `accessToken`');

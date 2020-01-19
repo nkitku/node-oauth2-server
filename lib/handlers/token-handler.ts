@@ -1,4 +1,4 @@
-import * as auth from 'basic-auth';
+import auth from 'basic-auth';
 import {
   InvalidArgumentError,
   InvalidClientError,
@@ -32,14 +32,22 @@ const grantTypes = {
   password: PasswordGrantType,
   refresh_token: RefreshTokenGrantType,
 };
+// eslint-disable-next-line import/prefer-default-export
 export class TokenHandler {
   accessTokenLifetime: any;
+
   grantTypes: { [key: string]: any };
+
   model: Model;
+
   refreshTokenLifetime: number;
+
   allowExtendedTokenAttributes: boolean;
+
   requireClientAuthentication: any;
+
   alwaysIssueNewRefreshToken: boolean;
+
   constructor(options: any = {}) {
     if (!options.accessTokenLifetime) {
       throw new InvalidArgumentError(
@@ -110,16 +118,14 @@ export class TokenHandler {
       const model = new TokenModel(data, {
         allowExtendedTokenAttributes: this.allowExtendedTokenAttributes,
       });
-      const tokenType = this.getTokenType(model);
-      this.updateSuccessResponse(response, tokenType);
+      const tokenType = TokenHandler.getTokenType(model);
+      TokenHandler.updateSuccessResponse(response, tokenType);
 
       return data;
     } catch (e) {
-      if (!(e instanceof OAuthError)) {
-        e = new ServerError(e);
-      }
-      this.updateErrorResponse(response, e);
-      throw e;
+      const toThrow = e instanceof OAuthError ? e : new ServerError(e);
+      TokenHandler.updateErrorResponse(response, toThrow);
+      throw toThrow;
     }
   }
 
@@ -127,7 +133,7 @@ export class TokenHandler {
    * Get the client from the model.
    */
 
-  async getClient(request, response) {
+  async getClient(request: Request, response: Response) {
     const credentials = this.getClientCredentials(request);
     const grantType = request.body.grant_type;
 
@@ -282,7 +288,7 @@ export class TokenHandler {
    * Get token type.
    */
 
-  getTokenType(model: any) {
+  static getTokenType(model: any) {
     return new BearerTokenType(
       model.accessToken,
       model.accessTokenLifetime,
@@ -296,7 +302,7 @@ export class TokenHandler {
    * Update response when a token is generated.
    */
 
-  updateSuccessResponse(response: Response, tokenType: BearerTokenType) {
+  static updateSuccessResponse(response: Response, tokenType: BearerTokenType) {
     response.body = tokenType.valueOf();
 
     response.set('Cache-Control', 'no-store');
@@ -307,7 +313,7 @@ export class TokenHandler {
    * Update response when an error is thrown.
    */
 
-  updateErrorResponse(response: Response, error: OAuthError) {
+  static updateErrorResponse(response: Response, error: OAuthError) {
     response.body = {
       error: error.name,
       error_description: error.message,

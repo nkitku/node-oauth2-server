@@ -8,6 +8,7 @@ import { Client, Token, User } from '../interfaces';
 import { Request } from '../request';
 import * as is from '../validator/is';
 
+// eslint-disable-next-line import/prefer-default-export
 export class PasswordGrantType extends AbstractGrantType {
   constructor(options: any = {}) {
     super(options);
@@ -35,7 +36,7 @@ export class PasswordGrantType extends AbstractGrantType {
    * @see https://tools.ietf.org/html/rfc6749#section-4.3.2
    */
 
-  async handle(request, client) {
+  async handle(request: Request, client: Client) {
     if (!request) {
       throw new InvalidArgumentError('Missing parameter: `request`');
     }
@@ -44,7 +45,7 @@ export class PasswordGrantType extends AbstractGrantType {
       throw new InvalidArgumentError('Missing parameter: `client`');
     }
 
-    const scope = this.getScope(request);
+    const scope = AbstractGrantType.getScope(request);
     const user = await this.getUser(request);
 
     return this.saveToken(user, client, scope);
@@ -88,7 +89,7 @@ export class PasswordGrantType extends AbstractGrantType {
    * Save token.
    */
 
-  async saveToken(user: User, client: Client, scope: string) {
+  async saveToken(user: User, client: Client, scope: string | undefined) {
     const accessScope = await this.validateScope(user, client, scope);
     const accessToken = await this.generateAccessToken(client, user, scope);
     const refreshToken = await this.generateRefreshToken(client, user, scope);

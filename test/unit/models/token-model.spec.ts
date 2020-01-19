@@ -18,8 +18,12 @@ describe('Model', () => {
       };
 
       const model = new TokenModel(data);
-      model.accessTokenLifetime.should.be.Number();
-      model.accessTokenLifetime.should.be.approximately(3600, 2);
+      const lifetime = model.accessTokenLifetime;
+      if (!lifetime) {
+        throw new Error('failure');
+      }
+      lifetime.should.be.Number();
+      lifetime.should.be.approximately(3600, 2);
     });
   });
 });

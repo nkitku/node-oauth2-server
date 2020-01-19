@@ -3,6 +3,7 @@ import * as sinon from 'sinon';
 import * as url from 'url';
 import { InvalidArgumentError } from '../../../lib/errors';
 import { CodeResponseType } from '../../../lib/response-types';
+import { User, Client } from '../../../lib/interfaces';
 
 /**
  * Test `CodeResponseType` integration.
@@ -12,6 +13,7 @@ describe('CodeResponseType integration', () => {
   describe('constructor()', () => {
     it('should throw an error if `options.authorizationCodeLifetime` is missing', () => {
       try {
+        // eslint-disable-next-line no-new
         new CodeResponseType();
 
         should.fail('should.fail', '');
@@ -38,6 +40,7 @@ describe('CodeResponseType integration', () => {
 
   it('should throw an error if the model does not implement `saveAuthorizationCode()`', () => {
     try {
+      // eslint-disable-next-line no-new
       new CodeResponseType({ authorizationCodeLifetime: 120, model: {} });
 
       should.fail('should.fail', '');
@@ -141,7 +144,11 @@ describe('CodeResponseType integration', () => {
       });
 
       return handler
-        .generateAuthorizationCode(undefined, undefined, undefined)
+        .generateAuthorizationCode(
+          (undefined as unknown) as Client,
+          (undefined as unknown) as User,
+          (undefined as unknown) as string,
+        )
         .then((data: any) => {
           data.should.be.a.sha1();
         })
@@ -165,7 +172,11 @@ describe('CodeResponseType integration', () => {
       });
 
       handler
-        .generateAuthorizationCode(undefined, undefined, undefined)
+        .generateAuthorizationCode(
+          (undefined as unknown) as Client,
+          (undefined as unknown) as User,
+          (undefined as unknown) as string,
+        )
         .should.be.an.instanceOf(Promise);
     });
 
@@ -222,7 +233,7 @@ describe('CodeResponseType integration', () => {
 
       return handler
         .saveAuthorizationCode('foo', 'bar', 'biz', 'baz')
-        .then(data => {
+        .then((data: string) => {
           data.should.equal(authorizationCode);
         })
         .catch(() => {
@@ -327,7 +338,11 @@ describe('CodeResponseType integration', () => {
       });
 
       return handler
-        .generateAuthorizationCode(undefined, undefined, undefined)
+        .generateAuthorizationCode(
+          (undefined as unknown) as Client,
+          (undefined as unknown) as User,
+          (undefined as unknown) as string,
+        )
         .then(() => {
           model.generateAuthorizationCode.callCount.should.equal(1);
         })

@@ -5,10 +5,14 @@ import { Request } from '../request';
 import * as tokenUtil from '../utils/token-util';
 import * as is from '../validator/is';
 
+// eslint-disable-next-line import/prefer-default-export
 export class AbstractGrantType {
   accessTokenLifetime: number;
+
   model: Model;
+
   refreshTokenLifetime: number;
+
   alwaysIssueNewRefreshToken: boolean;
 
   constructor(options: any = {}) {
@@ -32,11 +36,15 @@ export class AbstractGrantType {
    * Generate access token.
    */
 
-  async generateAccessToken(client?: Client, user?: User, scope?: string) {
+  async generateAccessToken(
+    client: Client,
+    user: User,
+    scope: string | undefined,
+  ) {
     if (this.model.generateAccessToken) {
       const token = await this.model.generateAccessToken(client, user, scope);
 
-      return token ? token : tokenUtil.GenerateRandomToken();
+      return token || tokenUtil.GenerateRandomToken();
     }
 
     return tokenUtil.GenerateRandomToken();
@@ -46,11 +54,15 @@ export class AbstractGrantType {
    * Generate refresh token.
    */
 
-  async generateRefreshToken(client?: Client, user?: User, scope?: string) {
+  async generateRefreshToken(
+    client: Client,
+    user: User,
+    scope: string | undefined,
+  ) {
     if (this.model.generateRefreshToken) {
       const token = await this.model.generateRefreshToken(client, user, scope);
 
-      return token ? token : tokenUtil.GenerateRandomToken();
+      return token || tokenUtil.GenerateRandomToken();
     }
 
     return tokenUtil.GenerateRandomToken();
@@ -80,7 +92,7 @@ export class AbstractGrantType {
    * Get scope from the request body.
    */
 
-  getScope(request: Request) {
+  static getScope(request: Request) {
     if (!is.nqschar(request.body.scope)) {
       throw new InvalidArgumentError('Invalid parameter: `scope`');
     }
@@ -91,7 +103,7 @@ export class AbstractGrantType {
   /**
    * Validate requested scope.
    */
-  async validateScope(user: User, client: Client, scope: string) {
+  async validateScope(user: User, client: Client, scope: string | undefined) {
     if (this.model.validateScope) {
       const validatedScope = await this.model.validateScope(
         user,

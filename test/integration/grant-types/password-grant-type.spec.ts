@@ -6,15 +6,23 @@ import {
 } from '../../../lib/errors';
 import { PasswordGrantType } from '../../../lib/grant-types';
 import { Request } from '../../../lib/request';
+import { Client } from '../../../lib/interfaces';
 
 /**
  * Test `PasswordGrantType` integration.
  */
 
 describe('PasswordGrantType integration', () => {
+  const someclient = {
+    id: 'foobar',
+    redirectUris: undefined,
+    grants: 'something',
+  };
+
   describe('constructor()', () => {
     it('should throw an error if `model` is missing', () => {
       try {
+        // eslint-disable-next-line no-new
         new PasswordGrantType({ accessTokenLifetime: 3600 });
 
         should.fail('should.fail', '');
@@ -26,6 +34,7 @@ describe('PasswordGrantType integration', () => {
 
     it('should throw an error if the model does not implement `getUser()`', () => {
       try {
+        // eslint-disable-next-line no-new
         new PasswordGrantType({ accessTokenLifetime: 3600, model: {} });
 
         should.fail('should.fail', '');
@@ -43,6 +52,7 @@ describe('PasswordGrantType integration', () => {
           getUser: () => {},
         };
 
+        // eslint-disable-next-line no-new
         new PasswordGrantType({ accessTokenLifetime: 3600, model });
 
         should.fail('should.fail', '');
@@ -67,7 +77,10 @@ describe('PasswordGrantType integration', () => {
       });
 
       try {
-        await grantType.handle(undefined, undefined);
+        await grantType.handle(
+          (undefined as unknown) as Request,
+          (undefined as unknown) as Client,
+        );
 
         should.fail('should.fail', '');
       } catch (e) {
@@ -87,7 +100,7 @@ describe('PasswordGrantType integration', () => {
       });
 
       try {
-        await grantType.handle({}, undefined);
+        await grantType.handle(new Request(), (undefined as unknown) as Client);
 
         should.fail('should.fail', '');
       } catch (e) {
@@ -97,7 +110,6 @@ describe('PasswordGrantType integration', () => {
     });
 
     it('should return a token', () => {
-      const client = { id: 'foobar' };
       const token = {};
       const model = {
         getUser: () => {
@@ -122,7 +134,7 @@ describe('PasswordGrantType integration', () => {
       });
 
       return grantType
-        .handle(request, client)
+        .handle(request, someclient)
         .then(data => {
           data.should.equal(token);
         })
@@ -132,7 +144,6 @@ describe('PasswordGrantType integration', () => {
     });
 
     it('should support promises', () => {
-      const client = { id: 'foobar' };
       const token = {};
       const model = {
         getUser() {
@@ -153,11 +164,10 @@ describe('PasswordGrantType integration', () => {
         query: {},
       });
 
-      grantType.handle(request, client).should.be.an.instanceOf(Promise);
+      grantType.handle(request, someclient).should.be.an.instanceOf(Promise);
     });
 
     it('should support non-promises', () => {
-      const client = { id: 'foobar' };
       const token = {};
       const model = {
         getUser() {
@@ -178,11 +188,10 @@ describe('PasswordGrantType integration', () => {
         query: {},
       });
 
-      grantType.handle(request, client).should.be.an.instanceOf(Promise);
+      grantType.handle(request, someclient).should.be.an.instanceOf(Promise);
     });
 
     /*     it('should support callbacks', () => {
-      const client = { id: 'foobar' };
       const token = {};
       const model = {
         getUser(username, password, callback) {

@@ -3,6 +3,7 @@ import { InvalidArgumentError, InvalidGrantError } from '../errors';
 import { Client, Token, User } from '../interfaces';
 import { Request } from '../request';
 
+// eslint-disable-next-line import/prefer-default-export
 export class ClientCredentialsGrantType extends AbstractGrantType {
   constructor(options: any = {}) {
     super(options);
@@ -38,7 +39,7 @@ export class ClientCredentialsGrantType extends AbstractGrantType {
       throw new InvalidArgumentError('Missing parameter: `client`');
     }
 
-    const scope = this.getScope(request);
+    const scope = AbstractGrantType.getScope(request);
     const user = await this.getUserFromClient(client);
 
     return this.saveToken(user, client, scope);
@@ -63,7 +64,7 @@ export class ClientCredentialsGrantType extends AbstractGrantType {
    * Save token.
    */
 
-  async saveToken(user: User, client: Client, scope: string) {
+  async saveToken(user: User, client: Client, scope: string | undefined) {
     const accessScope = await this.validateScope(user, client, scope);
     const accessToken = await this.generateAccessToken(client, user, scope);
     const accessTokenExpiresAt = this.getAccessTokenExpiresAt();

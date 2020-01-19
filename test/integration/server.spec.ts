@@ -18,6 +18,7 @@ describe('Server integration', () => {
   describe('constructor()', () => {
     it('should throw an error if `model` is missing', () => {
       try {
+        // eslint-disable-next-line no-new
         new Server({});
 
         should.fail('should.fail', '');
@@ -69,7 +70,8 @@ describe('Server integration', () => {
 
     it('should return a promise', () => {
       const model = {
-        async getAccessToken(token) {
+        // eslint-disable-next-line no-unused-vars
+        async getAccessToken(token: string) {
           return {
             user: {},
             accessTokenExpiresAt: new Date(new Date().getTime() + 10000),
