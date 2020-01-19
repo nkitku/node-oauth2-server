@@ -50,24 +50,27 @@
   "scripts": {
     "lint": "tslint -p tsconfig.build.json -c tslint.json",
     "lint:all": "tslint -p tsconfig.json -c tslint.json",
-    "build:clean": "npx shx rm -rf ./dist",
-    "build": "npx npm-run-all build:clean build:test:*",
-    "build:test:src": "npx tsc -p tsconfig.json",
+    "build:clean": "shx rm -rf ./dist",
+    "build": "npm-run-all build:clean build:test:*",
+    "build:test:src": "tsc -p tsconfig.json",
     "build:test:package": "node ./scripts/build-prod.js",
-    "build:prod": "npx npm-run-all build:clean build:prod:*",
-    "build:prod:src": "npx tsc -p tsconfig.build.json",
+    "build:prod": "npm-run-all build:clean build:prod:*",
+    "build:prod:src": "tsc -p tsconfig.build.json",
     "build:prod:package": "node ./scripts/build-prod.js",
-    "test": "npx mocha 'test/**/*.spec.ts' --config 'test/.mocharc.jsonc'"
+	"test": "nyc mocha 'test/**/*.spec.ts' --config 'test/.mocharc.jsonc'",
+	"test:clean": "shx rm -rf ./coverage && shx rm -rf ./.nyc_output"
   },
   "repository": {
     "url": "https://github.com/oauthjs/node-oauth2-server.git",
     "type": "git"
   },
   "devDependencies": {
+    "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@types/mocha": "^5.2.7",
     "@types/sinon": "^7.5.1",
     "mocha": "^6.2.2",
     "npm-run-all": "^4.1.5",
+    "nyc": "^15.0.0",
     "should": "^13.2.3",
     "shx": "^0.3.2",
     "sinon": "^7.5.0",

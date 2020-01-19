@@ -5,6 +5,11 @@
 /.vscode/*.code-workspace
 /.vscode/settings.json
 
+# codecoverage
+/.nyc_output
+/coverage
+
+
 # misc
 npm-debug.log
 # folders
