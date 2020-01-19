@@ -9,8 +9,10 @@ import {
 import { Request } from './request';
 import { Response } from './response';
 
+// eslint-disable-next-line import/prefer-default-export
 export class OAuth2Server {
   options: any;
+
   constructor(options: any = {}) {
     if (!options.model) {
       throw new InvalidArgumentError('Missing parameter: `model`');
@@ -22,24 +24,12 @@ export class OAuth2Server {
   /**
    * Authenticate a token.
    */
-  authenticate(
-    request: Request,
-    response?: Response,
-    scope?: string,
-  ): Promise<any>;
-  authenticate(
-    request: Request,
-    response?: Response,
-    // tslint:disable-next-line:unified-signatures
-    options?: any,
-  ): Promise<any>;
-
   async authenticate(
     request: Request,
-    response?: Response,
-    options?: string | any,
-  ) {
-    let opt = options;
+    response: Response,
+    scopeOrOptions?: string | any,
+  ): Promise<any> {
+    let opt = scopeOrOptions;
     if (typeof opt === 'string') {
       opt = { scope: opt };
     }

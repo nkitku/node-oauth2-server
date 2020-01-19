@@ -3,10 +3,14 @@ import { ImplicitGrantType } from '../grant-types';
 import { Client, Model, User } from '../interfaces';
 import { Request } from '../request';
 
+// eslint-disable-next-line import/prefer-default-export
 export class TokenResponseType {
-  accessToken: string;
+  accessToken: string | undefined;
+
   accessTokenLifetime: number;
+
   model: Model;
+
   constructor(options: any = {}) {
     if (!options.accessTokenLifetime) {
       throw new InvalidArgumentError(
@@ -78,6 +82,7 @@ export class TokenResponseType {
    * Set redirect uri parameter.
    */
 
+  // eslint-disable-next-line class-methods-use-this
   setRedirectUriParam(redirectUri: any, key: string, value: any) {
     if (!redirectUri) {
       throw new InvalidArgumentError('Missing parameter: `redirectUri`');

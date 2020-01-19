@@ -11,9 +11,9 @@ import {
   UnauthorizedClientError,
   UnsupportedResponseTypeError,
 } from '../errors';
-import { Client, Model, User } from '../interfaces';
 import { Request } from '../request';
 import { Response } from '../response';
+import { Client, User, Model } from '../interfaces';
 import { CodeResponseType, TokenResponseType } from '../response-types';
 import { hasOwnProperty } from '../utils/fn';
 import * as is from '../validator/is';
@@ -31,11 +31,16 @@ const responseTypes = {
  * Constructor.
  */
 
+// eslint-disable-next-line import/prefer-default-export
 export class AuthorizeHandler {
   options: any;
+
   allowEmptyState: boolean;
+
   authenticateHandler: any;
+
   model: Model;
+
   constructor(options: any = {}) {
     if (options.authenticateHandler && !options.authenticateHandler.handle) {
       throw new InvalidArgumentError(
@@ -90,17 +95,17 @@ export class AuthorizeHandler {
     const user = await this.getUser(request, response);
 
     let scope: string;
-    let state: string;
+    let state: string | undefined;
     let RequestedResponseType: any;
     let responseType: any;
-    const uri = this.getRedirectUri(request, client);
+    const uri = AuthorizeHandler.getRedirectUri(request, client);
     try {
-      const requestedScope = this.getScope(request);
+      const requestedScope = AuthorizeHandler.getScope(request);
 
       const validScope = await this.validateScope(user, client, requestedScope);
       scope = validScope;
       state = this.getState(request);
-      RequestedResponseType = this.getResponseType(request, client);
+      RequestedResponseType = AuthorizeHandler.getResponseType(request, client);
       responseType = new RequestedResponseType(this.options);
       const codeOrAccessToken = await responseType.handle(
         request,
@@ -109,20 +114,27 @@ export class AuthorizeHandler {
         uri,
         scope,
       );
-      const redirectUri = this.buildSuccessRedirectUri(uri, responseType);
-      this.updateResponse(response, redirectUri, responseType, state);
+      const redirectUri = AuthorizeHandler.buildSuccessRedirectUri(uri, responseType);
+      AuthorizeHandler.updateResponse(response, redirectUri, responseType, state);
 
       return codeOrAccessToken;
     } catch (e) {
-      if (!(e instanceof OAuthError)) {
-        e = new ServerError(e);
-      }
+      const rethrow = e instanceof OAuthError ? e : new ServerError(e);
 
-      const redirectUri = this.buildErrorRedirectUri(uri, responseType, e);
+      const redirectUri = AuthorizeHandler.buildErrorRedirectUri(
+        uri,
+        responseType,
+        rethrow,
+      );
 
-      this.updateResponse(response, redirectUri, responseType, state);
+      AuthorizeHandler.updateResponse(
+        response,
+        redirectUri,
+        responseType,
+        state,
+      );
 
-      throw e;
+      throw rethrow;
     }
   }
 
@@ -212,7 +224,7 @@ export class AuthorizeHandler {
    * Get scope from the request.
    */
 
-  getScope(request: Request) {
+  static getScope(request: Request) {
     const scope = request.body.scope || request.query.scope;
 
     if (!is.nqschar(scope)) {
@@ -265,11 +277,11 @@ export class AuthorizeHandler {
    * Get redirect URI.
    */
 
-  getRedirectUri(request: Request, client: Client) {
+  static getRedirectUri(request: Request, client: Client) {
     return (
       request.body.redirect_uri ||
       request.query.redirect_uri ||
-      client.redirectUris[0]
+      (client.redirectUris && client.redirectUris[0])
     );
   }
 
@@ -277,8 +289,8 @@ export class AuthorizeHandler {
    * Get response type.
    */
 
-  getResponseType(request: Request, client: Client) {
-    const responseType =
+  static getResponseType(request: Request, client: Client) {
+    const responseType: 'code' | 'token' =
       request.body.response_type || request.query.response_type;
 
     if (!responseType) {
@@ -307,7 +319,7 @@ export class AuthorizeHandler {
    * Build a successful response that redirects the user-agent to the client-provided url.
    */
 
-  buildSuccessRedirectUri(
+  static buildSuccessRedirectUri(
     redirectUri: string,
     responseType: CodeResponseType | TokenResponseType,
   ) {
@@ -320,7 +332,7 @@ export class AuthorizeHandler {
    * Build an error response that redirects the user-agent to the client-provided url.
    */
 
-  buildErrorRedirectUri(
+  static buildErrorRedirectUri(
     redirectUri: any,
     responseType: CodeResponseType | TokenResponseType,
     error: Error,
@@ -354,24 +366,25 @@ export class AuthorizeHandler {
    * Update response with the redirect uri and the state parameter, if available.
    */
 
-  updateResponse(
+  static updateResponse(
     response: Response,
     redirectUri: any,
     responseType: CodeResponseType | TokenResponseType,
     state: any,
   ) {
+    let newRedirectUri = redirectUri;
     if (responseType && state) {
       // tslint:disable-next-line:no-parameter-reassignment
-      redirectUri = responseType.setRedirectUriParam(
+      newRedirectUri = responseType.setRedirectUriParam(
         redirectUri,
         'state',
         state,
       );
     } else if (state) {
-      redirectUri.query = redirectUri.query || {};
-      redirectUri.query.state = state;
+      newRedirectUri.query = newRedirectUri.query || {};
+      newRedirectUri.query.state = state;
     }
 
-    response.redirect(url.format(redirectUri));
+    response.redirect(url.format(newRedirectUri));
   }
 }

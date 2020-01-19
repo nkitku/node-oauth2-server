@@ -7,6 +7,7 @@ import {
 } from '../../../lib/errors';
 import { RefreshTokenGrantType } from '../../../lib/grant-types';
 import { Request } from '../../../lib/request';
+import { Client } from '../../../lib/interfaces';
 
 /**
  * Test `RefreshTokenGrantType` integration.
@@ -87,7 +88,10 @@ describe('RefreshTokenGrantType integration', () => {
       });
 
       try {
-        await grantType.handle(undefined, undefined);
+        await grantType.handle(
+          (undefined as unknown) as Request,
+          (undefined as unknown) as Client,
+        );
 
         should.fail('should.fail', '');
       } catch (e) {
@@ -114,7 +118,7 @@ describe('RefreshTokenGrantType integration', () => {
       });
 
       try {
-        await grantType.handle(request, undefined);
+        await grantType.handle(request, (undefined as unknown) as Client);
 
         should.fail('should.fail', '');
       } catch (e) {
@@ -296,9 +300,7 @@ describe('RefreshTokenGrantType integration', () => {
     it('should throw an error if `refreshToken` is not found', () => {
       const client: any = { id: 123 };
       const model = {
-        getRefreshToken() {
-          return;
-        },
+        getRefreshToken() {},
         revokeToken() {},
         saveToken() {},
       };

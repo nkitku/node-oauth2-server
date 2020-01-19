@@ -10,8 +10,9 @@ describe('BearerTokenType integration', () => {
   describe('constructor()', () => {
     it('should throw an error if `accessToken` is missing', () => {
       try {
+        // eslint-disable-next-line no-new
         new BearerTokenType(
-          undefined,
+          (undefined as unknown) as string,
           undefined,
           undefined,
           undefined,
@@ -40,13 +41,13 @@ describe('BearerTokenType integration', () => {
     it('should set the `accessTokenLifetime`', () => {
       const responseType = new BearerTokenType(
         'foo',
-        'bar' as any,
+        1,
         undefined,
         undefined,
         undefined,
       );
 
-      responseType.accessTokenLifetime.should.equal('bar');
+      (responseType.accessTokenLifetime as number).should.equal(1);
     });
 
     it('should set the `refreshToken`', () => {
@@ -58,7 +59,7 @@ describe('BearerTokenType integration', () => {
         undefined,
       );
 
-      responseType.refreshToken.should.equal('biz');
+      (responseType.refreshToken as string).should.equal('biz');
     });
   });
 

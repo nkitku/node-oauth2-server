@@ -7,16 +7,22 @@ import {
   ServerError,
   UnauthorizedRequestError,
 } from '../errors';
-import { Model, Token } from '../interfaces';
 import { Request } from '../request';
 import { Response } from '../response';
+import { Token, Model } from '../interfaces';
 
+// eslint-disable-next-line import/prefer-default-export
 export class AuthenticateHandler {
   addAcceptedScopesHeader: any;
+
   addAuthorizedScopesHeader: any;
+
   allowBearerTokensInQueryString: any;
+
   model: Model;
+
   scope: any;
+
   constructor(options: any = {}) {
     if (!options.model) {
       throw new InvalidArgumentError('Missing parameter: `model`');
@@ -77,7 +83,7 @@ export class AuthenticateHandler {
     try {
       let token = await this.getTokenFromRequest(request);
       token = await this.getAccessToken(token);
-      this.validateAccessToken(token);
+      AuthenticateHandler.validateAccessToken(token);
       if (this.scope) {
         await this.verifyScope(token);
       }
@@ -121,7 +127,7 @@ export class AuthenticateHandler {
     }
 
     if (headerToken) {
-      return this.getTokenFromRequestHeader(request);
+      return AuthenticateHandler.getTokenFromRequestHeader(request);
     }
 
     if (queryToken) {
@@ -129,7 +135,7 @@ export class AuthenticateHandler {
     }
 
     if (bodyToken) {
-      return this.getTokenFromRequestBody(request);
+      return AuthenticateHandler.getTokenFromRequestBody(request);
     }
 
     throw new UnauthorizedRequestError(
@@ -143,7 +149,7 @@ export class AuthenticateHandler {
    * @see http://tools.ietf.org/html/rfc6750#section-2.1
    */
 
-  getTokenFromRequestHeader(request: Request) {
+  static getTokenFromRequestHeader(request: Request) {
     const token = request.get('Authorization');
     const matches = token.match(/Bearer\s(\S+)/);
 
@@ -189,7 +195,7 @@ export class AuthenticateHandler {
    * @see http://tools.ietf.org/html/rfc6750#section-2.2
    */
 
-  getTokenFromRequestBody(request: Request) {
+  static getTokenFromRequestBody(request: Request) {
     if (request.method === 'GET') {
       throw new InvalidRequestError(
         'Invalid request: token may not be passed in the body when using the GET verb',
@@ -228,7 +234,7 @@ export class AuthenticateHandler {
    * Validate access token.
    */
 
-  validateAccessToken(accessToken: Token) {
+  static validateAccessToken(accessToken: Token) {
     if (!(accessToken.accessTokenExpiresAt instanceof Date)) {
       throw new ServerError(
         'Server error: `accessTokenExpiresAt` must be a Date instance',
@@ -266,7 +272,8 @@ export class AuthenticateHandler {
       response.set('X-Accepted-OAuth-Scopes', this.scope);
     }
 
-    if (this.scope && this.addAuthorizedScopesHeader) {
+    // Or throw when accessToken.scope is not set?
+    if (this.scope && this.addAuthorizedScopesHeader && accessToken.scope) {
       response.set('X-OAuth-Scopes', accessToken.scope);
     }
   }

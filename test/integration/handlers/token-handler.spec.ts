@@ -14,6 +14,7 @@ import { TokenHandler } from '../../../lib/handlers';
 import { Request } from '../../../lib/request';
 import { Response } from '../../../lib/response';
 import { BearerTokenType } from '../../../lib/token-types';
+import { Client } from '../../../lib/interfaces';
 
 /**
  * Test `TokenHandler` integration.
@@ -56,6 +57,7 @@ describe('TokenHandler integration', () => {
 
     it('should throw an error if the model does not implement `getClient()`', () => {
       try {
+        // eslint-disable-next-line no-new
         new TokenHandler({
           accessTokenLifetime: 120,
           model: {},
@@ -195,7 +197,10 @@ describe('TokenHandler integration', () => {
       });
 
       try {
-        await handler.handle(undefined, undefined);
+        await handler.handle(
+          (undefined as unknown) as Request,
+          (undefined as unknown) as Response,
+        );
 
         should.fail('should.fail', '');
       } catch (e) {
@@ -224,7 +229,7 @@ describe('TokenHandler integration', () => {
       });
 
       try {
-        await handler.handle(request, undefined);
+        await handler.handle(request, (undefined as unknown) as Response);
 
         should.fail('should.fail', '');
       } catch (e) {
@@ -602,7 +607,7 @@ describe('TokenHandler integration', () => {
       });
 
       try {
-        await handler.getClient(request, undefined);
+        await handler.getClient(request, new Response());
 
         should.fail('should.fail', '');
       } catch (e) {
@@ -629,7 +634,7 @@ describe('TokenHandler integration', () => {
       });
 
       try {
-        await handler.getClient(request, undefined);
+        await handler.getClient(request, new Response());
 
         should.fail('should.fail', '');
       } catch (e) {
@@ -656,7 +661,7 @@ describe('TokenHandler integration', () => {
       });
 
       return handler
-        .getClient(request, undefined)
+        .getClient(request, new Response())
         .then(() => {
           should.fail('should.fail', '');
         })
@@ -686,7 +691,7 @@ describe('TokenHandler integration', () => {
       });
 
       return handler
-        .getClient(request, undefined)
+        .getClient(request, new Response())
         .then(() => {
           should.fail('should.fail', '');
         })
@@ -715,7 +720,7 @@ describe('TokenHandler integration', () => {
         query: {},
       });
       try {
-        await handler.getClient(request, undefined);
+        await handler.getClient(request, new Response());
         should.fail('should.fail', '');
       } catch (e) {
         e.should.be.an.instanceOf(ServerError);
@@ -782,7 +787,7 @@ describe('TokenHandler integration', () => {
         query: {},
       });
       try {
-        const data = await handler.getClient(request, undefined);
+        const data = await handler.getClient(request, new Response());
         data.should.equal(client);
       } catch (error) {
         should.fail('should.fail', '');
@@ -815,7 +820,7 @@ describe('TokenHandler integration', () => {
         });
 
         return handler
-          .getClient(request, undefined)
+          .getClient(request, new Response())
           .then(data => {
             data.should.equal(client);
           })
@@ -856,7 +861,7 @@ describe('TokenHandler integration', () => {
         });
 
         return handler
-          .getClient(request, undefined)
+          .getClient(request, new Response())
           .then(data => {
             data.should.equal(client);
           })
@@ -885,7 +890,7 @@ describe('TokenHandler integration', () => {
         query: {},
       });
 
-      handler.getClient(request, undefined).should.be.an.instanceOf(Promise);
+      handler.getClient(request, new Response()).should.be.an.instanceOf(Promise);
     });
 
     it('should support non-promises', () => {
@@ -907,7 +912,9 @@ describe('TokenHandler integration', () => {
         query: {},
       });
 
-      handler.getClient(request, undefined).should.be.an.instanceOf(Promise);
+      handler
+        .getClient(request, new Response())
+        .should.be.an.instanceOf(Promise);
     });
 
     /*     it('should support callbacks', () => {
@@ -1087,7 +1094,10 @@ describe('TokenHandler integration', () => {
       });
 
       try {
-        await handler.handleGrantType(request, undefined);
+        await handler.handleGrantType(
+          request,
+          (undefined as unknown) as Client,
+        );
 
         should.fail('should.fail', '');
       } catch (e) {
@@ -1114,7 +1124,10 @@ describe('TokenHandler integration', () => {
       });
 
       try {
-        await handler.handleGrantType(request, undefined);
+        await handler.handleGrantType(
+          request,
+          (undefined as unknown) as Client,
+        );
         should.fail('should.fail', '');
       } catch (e) {
         e.should.be.an.instanceOf(InvalidRequestError);
@@ -1140,7 +1153,10 @@ describe('TokenHandler integration', () => {
       });
 
       try {
-        await handler.handleGrantType(request, undefined);
+        await handler.handleGrantType(
+          request,
+          (undefined as unknown) as Client,
+        );
 
         should.fail('should.fail', '');
       } catch (e) {
@@ -1526,16 +1542,7 @@ describe('TokenHandler integration', () => {
 
   describe('getTokenType()', () => {
     it('should return a token type', () => {
-      const model = {
-        getClient() {},
-        saveToken() {},
-      };
-      const handler = new TokenHandler({
-        accessTokenLifetime: 120,
-        model,
-        refreshTokenLifetime: 120,
-      });
-      const tokenType = handler.getTokenType({
+      const tokenType = TokenHandler.getTokenType({
         accessToken: 'foo',
         refreshToken: 'bar',
         scope: 'foobar',
@@ -1552,15 +1559,6 @@ describe('TokenHandler integration', () => {
 
   describe('updateSuccessResponse()', () => {
     it('should set the `body`', () => {
-      const model = {
-        getClient() {},
-        saveToken() {},
-      };
-      const handler = new TokenHandler({
-        accessTokenLifetime: 120,
-        model,
-        refreshTokenLifetime: 120,
-      });
       const tokenType = new BearerTokenType(
         'foo',
         'bar' as any,
@@ -1570,7 +1568,7 @@ describe('TokenHandler integration', () => {
       );
       const response = new Response({ body: {}, headers: {} });
 
-      handler.updateSuccessResponse(response, tokenType);
+      TokenHandler.updateSuccessResponse(response, tokenType);
 
       response.body.should.eql({
         access_token: 'foo',
@@ -1581,15 +1579,6 @@ describe('TokenHandler integration', () => {
     });
 
     it('should set the `Cache-Control` header', () => {
-      const model = {
-        getClient() {},
-        saveToken() {},
-      };
-      const handler = new TokenHandler({
-        accessTokenLifetime: 120,
-        model,
-        refreshTokenLifetime: 120,
-      });
       const tokenType = new BearerTokenType(
         'foo',
         'bar' as any,
@@ -1599,21 +1588,12 @@ describe('TokenHandler integration', () => {
       );
       const response = new Response({ body: {}, headers: {} });
 
-      handler.updateSuccessResponse(response, tokenType);
+      TokenHandler.updateSuccessResponse(response, tokenType);
 
       response.get('Cache-Control').should.equal('no-store');
     });
 
     it('should set the `Pragma` header', () => {
-      const model = {
-        getClient() {},
-        saveToken() {},
-      };
-      const handler = new TokenHandler({
-        accessTokenLifetime: 120,
-        model,
-        refreshTokenLifetime: 120,
-      });
       const tokenType = new BearerTokenType(
         'foo',
         'bar' as any,
@@ -1623,7 +1603,7 @@ describe('TokenHandler integration', () => {
       );
       const response = new Response({ body: {}, headers: {} });
 
-      handler.updateSuccessResponse(response, tokenType);
+      TokenHandler.updateSuccessResponse(response, tokenType);
 
       response.get('Pragma').should.equal('no-cache');
     });
@@ -1632,18 +1612,9 @@ describe('TokenHandler integration', () => {
   describe('updateErrorResponse()', () => {
     it('should set the `body`', () => {
       const error = new AccessDeniedError('Cannot request a token');
-      const model = {
-        getClient() {},
-        saveToken() {},
-      };
-      const handler = new TokenHandler({
-        accessTokenLifetime: 120,
-        model,
-        refreshTokenLifetime: 120,
-      });
       const response = new Response({ body: {}, headers: {} });
 
-      handler.updateErrorResponse(response, error);
+      TokenHandler.updateErrorResponse(response, error);
 
       response.body.error.should.equal('access_denied');
       response.body.error_description.should.equal('Cannot request a token');
@@ -1651,18 +1622,9 @@ describe('TokenHandler integration', () => {
 
     it('should set the `status`', () => {
       const error = new AccessDeniedError('Cannot request a token');
-      const model = {
-        getClient() {},
-        saveToken() {},
-      };
-      const handler = new TokenHandler({
-        accessTokenLifetime: 120,
-        model,
-        refreshTokenLifetime: 120,
-      });
       const response = new Response({ body: {}, headers: {} });
 
-      handler.updateErrorResponse(response, error);
+      TokenHandler.updateErrorResponse(response, error);
 
       response.status.should.equal(400);
     });

@@ -2,6 +2,8 @@ import * as should from 'should';
 import { InvalidArgumentError } from '../../../lib/errors';
 import { AbstractGrantType } from '../../../lib/grant-types';
 import { Request } from '../../../lib/request';
+import { Client, User } from '../../../lib/interfaces';
+
 /**
  * Test `AbstractGrantType` integration.
  */
@@ -9,6 +11,7 @@ describe('AbstractGrantType integration', () => {
   describe('constructor()', () => {
     it('should throw an error if `options.accessTokenLifetime` is missing', () => {
       try {
+        // eslint-disable-next-line no-new
         new AbstractGrantType();
         should.fail('no error was thrown', '');
       } catch (e) {
@@ -19,6 +22,7 @@ describe('AbstractGrantType integration', () => {
 
     it('should throw an error if `options.model` is missing', () => {
       try {
+        // eslint-disable-next-line no-new
         new AbstractGrantType({ accessTokenLifetime: 123 });
         should.fail('should.fail', '');
       } catch (e) {
@@ -65,7 +69,11 @@ describe('AbstractGrantType integration', () => {
         refreshTokenLifetime: 456,
       });
       try {
-        const data: any = await handler.generateAccessToken();
+        const data: any = await handler.generateAccessToken(
+          (undefined as unknown) as Client,
+          (undefined as unknown) as User,
+          undefined,
+        );
         data.should.be.a.sha1();
       } catch (error) {
         should.fail('should.fail', '');
@@ -84,7 +92,13 @@ describe('AbstractGrantType integration', () => {
         refreshTokenLifetime: 456,
       });
 
-      handler.generateAccessToken().should.be.an.instanceOf(Promise);
+      handler
+        .generateAccessToken(
+          (undefined as unknown) as Client,
+          (undefined as unknown) as User,
+          undefined,
+        )
+        .should.be.an.instanceOf(Promise);
     });
 
     it('should support non-promises', () => {
@@ -99,7 +113,13 @@ describe('AbstractGrantType integration', () => {
         refreshTokenLifetime: 456,
       });
 
-      handler.generateAccessToken().should.be.an.instanceOf(Promise);
+      handler
+        .generateAccessToken(
+          (undefined as unknown) as Client,
+          (undefined as unknown) as User,
+          undefined,
+        )
+        .should.be.an.instanceOf(Promise);
     });
   });
 
@@ -111,10 +131,14 @@ describe('AbstractGrantType integration', () => {
         refreshTokenLifetime: 456,
       });
       try {
-        const data: any = await handler.generateRefreshToken();
-        data.should.be.a.sha1();
+        await handler.generateRefreshToken(
+          (undefined as unknown) as Client,
+          (undefined as unknown) as User,
+          undefined,
+        );
+        should.fail('should.fail fail', '');
       } catch (error) {
-        should.fail('should.fail fail', error.message);
+        // Success
       }
     });
 
@@ -130,7 +154,13 @@ describe('AbstractGrantType integration', () => {
         refreshTokenLifetime: 456,
       });
 
-      handler.generateRefreshToken().should.be.an.instanceOf(Promise);
+      handler
+        .generateRefreshToken(
+          (undefined as unknown) as Client,
+          (undefined as unknown) as User,
+          undefined,
+        )
+        .should.be.an.instanceOf(Promise);
     });
 
     it('should support non-promises', () => {
@@ -145,7 +175,13 @@ describe('AbstractGrantType integration', () => {
         refreshTokenLifetime: 456,
       });
 
-      handler.generateRefreshToken().should.be.an.instanceOf(Promise);
+      handler
+        .generateRefreshToken(
+          (undefined as unknown) as Client,
+          (undefined as unknown) as User,
+          undefined,
+        )
+        .should.be.an.instanceOf(Promise);
     });
   });
 
@@ -175,11 +211,6 @@ describe('AbstractGrantType integration', () => {
 
   describe('getScope()', () => {
     it('should throw an error if `scope` is invalid', () => {
-      const handler = new AbstractGrantType({
-        accessTokenLifetime: 123,
-        model: {},
-        refreshTokenLifetime: 456,
-      });
       const request = new Request({
         body: { scope: 'øå€£‰' },
         headers: {},
@@ -188,7 +219,7 @@ describe('AbstractGrantType integration', () => {
       });
 
       try {
-        handler.getScope(request);
+        AbstractGrantType.getScope(request);
         should.fail('should.fail', '');
       } catch (e) {
         e.should.be.an.instanceOf(InvalidArgumentError);
@@ -197,11 +228,6 @@ describe('AbstractGrantType integration', () => {
     });
 
     it('should allow the `scope` to be `undefined`', () => {
-      const handler = new AbstractGrantType({
-        accessTokenLifetime: 123,
-        model: {},
-        refreshTokenLifetime: 456,
-      });
       const request = new Request({
         body: {},
         headers: {},
@@ -209,15 +235,10 @@ describe('AbstractGrantType integration', () => {
         query: {},
       });
 
-      should.not.exist(handler.getScope(request));
+      should.not.exist(AbstractGrantType.getScope(request));
     });
 
     it('should return the scope', () => {
-      const handler = new AbstractGrantType({
-        accessTokenLifetime: 123,
-        model: {},
-        refreshTokenLifetime: 456,
-      });
       const request = new Request({
         body: { scope: 'foo' },
         headers: {},
@@ -225,7 +246,7 @@ describe('AbstractGrantType integration', () => {
         query: {},
       });
 
-      handler.getScope(request).should.equal('foo');
+      AbstractGrantType.getScope(request).should.equal('foo');
     });
   });
 });

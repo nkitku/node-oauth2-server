@@ -2,6 +2,7 @@ import * as should from 'should';
 import { InvalidArgumentError, InvalidGrantError } from '../../../lib/errors';
 import { ClientCredentialsGrantType } from '../../../lib/grant-types';
 import { Request } from '../../../lib/request';
+import { Client } from '../../../lib/interfaces';
 
 /**
  * Test `ClientCredentialsGrantType` integration.
@@ -11,6 +12,7 @@ describe('ClientCredentialsGrantType integration', () => {
   describe('constructor()', () => {
     it('should throw an error if `model` is missing', () => {
       try {
+        // eslint-disable-next-line no-new
         new ClientCredentialsGrantType({ accessTokenLifetime: 3600 });
 
         should.fail('should.fail', '');
@@ -22,6 +24,7 @@ describe('ClientCredentialsGrantType integration', () => {
 
     it('should throw an error if the model does not implement `getUserFromClient()`', () => {
       try {
+        // eslint-disable-next-line no-new
         new ClientCredentialsGrantType({
           accessTokenLifetime: 3600,
           model: {},
@@ -42,6 +45,7 @@ describe('ClientCredentialsGrantType integration', () => {
           getUserFromClient() {},
         };
 
+        // eslint-disable-next-line no-new
         new ClientCredentialsGrantType({ accessTokenLifetime: 3600, model });
 
         should.fail('should.fail', '');
@@ -66,7 +70,10 @@ describe('ClientCredentialsGrantType integration', () => {
       });
 
       try {
-        await grantType.handle(undefined, undefined);
+        await grantType.handle(
+          (undefined as unknown) as Request,
+          (undefined as unknown) as Client,
+        );
 
         should.fail('should.fail', '');
       } catch (e) {
@@ -92,7 +99,7 @@ describe('ClientCredentialsGrantType integration', () => {
       });
 
       try {
-        await grantType.handle(request, undefined);
+        await grantType.handle(request, (undefined as unknown) as Client);
 
         should.fail('should.fail', '');
       } catch (e) {
@@ -194,12 +201,6 @@ describe('ClientCredentialsGrantType integration', () => {
         accessTokenLifetime: 120,
         model,
       });
-      const request = new Request({
-        body: {},
-        headers: {},
-        method: 'ANY',
-        query: {},
-      });
 
       return grantType
         .getUserFromClient({} as any)
@@ -224,12 +225,6 @@ describe('ClientCredentialsGrantType integration', () => {
         accessTokenLifetime: 120,
         model,
       });
-      const request = new Request({
-        body: {},
-        headers: {},
-        method: 'ANY',
-        query: {},
-      });
       try {
         const data = await grantType.getUserFromClient({} as any);
         data.should.equal(user);
@@ -250,12 +245,6 @@ describe('ClientCredentialsGrantType integration', () => {
         accessTokenLifetime: 120,
         model,
       });
-      const request = new Request({
-        body: {},
-        headers: {},
-        method: 'ANY',
-        query: {},
-      });
 
       grantType.getUserFromClient({} as any).should.be.an.instanceOf(Promise);
     });
@@ -271,12 +260,6 @@ describe('ClientCredentialsGrantType integration', () => {
       const grantType = new ClientCredentialsGrantType({
         accessTokenLifetime: 120,
         model,
-      });
-      const request = new Request({
-        body: {},
-        headers: {},
-        method: 'ANY',
-        query: {},
       });
 
       grantType.getUserFromClient({} as any).should.be.an.instanceOf(Promise);

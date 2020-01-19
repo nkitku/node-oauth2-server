@@ -13,8 +13,10 @@ import { Response } from '../response';
 import { oneSuccess } from '../utils/fn';
 import * as is from '../validator/is';
 
+// eslint-disable-next-line import/prefer-default-export
 export class RevokeHandler {
   model: Model;
+
   constructor(options: any = {}) {
     if (!options.model) {
       throw new InvalidArgumentError('Missing parameter: `model`');
@@ -111,17 +113,13 @@ export class RevokeHandler {
    */
 
   async handleRevokeToken(request: Request, client: Client) {
-    try {
-      let token = await this.getTokenFromRequest(request);
-      token = await oneSuccess([
-        this.getAccessToken(token, client),
-        this.getRefreshToken(token, client),
-      ]);
+    let token = await RevokeHandler.getTokenFromRequest(request);
+    token = await oneSuccess([
+      this.getAccessToken(token, client),
+      this.getRefreshToken(token, client),
+    ]);
 
-      return this.revokeToken(token);
-    } catch (errors) {
-      throw errors;
-    }
+    return this.revokeToken(token);
   }
 
   /**
@@ -129,7 +127,7 @@ export class RevokeHandler {
    */
 
   async getClient(request: Request, response: Response) {
-    const credentials = this.getClientCredentials(request);
+    const credentials = RevokeHandler.getClientCredentials(request);
 
     if (!credentials.clientId) {
       throw new InvalidRequestError('Missing parameter: `client_id`');
@@ -188,7 +186,7 @@ export class RevokeHandler {
    * @see https://tools.ietf.org/html/rfc6749#section-2.3.1
    */
 
-  getClientCredentials(request: Request) {
+  static getClientCredentials(request: Request) {
     const credentials = auth(request as any);
 
     if (credentials) {
@@ -213,7 +211,7 @@ export class RevokeHandler {
    * @see https://tools.ietf.org/html/rfc7009#section-2.1
    */
 
-  getTokenFromRequest(request: Request) {
+  static getTokenFromRequest(request: Request) {
     const bodyToken = request.body.token;
 
     if (!bodyToken) {
@@ -227,7 +225,7 @@ export class RevokeHandler {
    * Get refresh token.
    */
 
-  async getRefreshToken(token, client: Client) {
+  async getRefreshToken(token: string, client: Client) {
     const refreshToken = await this.model.getRefreshToken(token);
     if (!refreshToken) {
       throw new InvalidTokenError('Invalid token: refresh token is invalid');

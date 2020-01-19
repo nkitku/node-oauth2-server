@@ -5,6 +5,7 @@ import {
   TokenHandler,
 } from '../../lib/handlers';
 import { OAuth2Server as Server } from '../../lib/server';
+import { Response } from '../../lib/response';
 
 const Authenticate: any = AuthenticateHandler;
 const Authorize: any = AuthorizeHandler;
@@ -23,7 +24,10 @@ describe('Server', () => {
 
       sinon.stub(Authenticate.prototype, 'handle').returns(Promise.resolve());
 
-      await server.authenticate('foo' as any);
+      await server.authenticate(
+        'foo' as any,
+        new Response({ body: {}, headers: {} }),
+      );
 
       Authenticate.prototype.handle.callCount.should.equal(1);
       Authenticate.prototype.handle.firstCall.args[0].should.equal('foo');

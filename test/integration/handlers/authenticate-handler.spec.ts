@@ -20,6 +20,7 @@ describe('AuthenticateHandler integration', () => {
   describe('constructor()', () => {
     it('should throw an error if `options.model` is missing', () => {
       try {
+        // eslint-disable-next-line no-new
         new AuthenticateHandler();
 
         should.fail('should.fail', '');
@@ -31,6 +32,7 @@ describe('AuthenticateHandler integration', () => {
 
     it('should throw an error if the model does not implement `getAccessToken()`', () => {
       try {
+        // eslint-disable-next-line no-new
         new AuthenticateHandler({ model: {} });
 
         should.fail('should.fail', '');
@@ -44,6 +46,7 @@ describe('AuthenticateHandler integration', () => {
 
     it('should throw an error if `scope` was given and `addAcceptedScopesHeader()` is missing', () => {
       try {
+        // eslint-disable-next-line no-new
         new AuthenticateHandler({
           model: { getAccessToken() {} },
           scope: 'foobar',
@@ -58,6 +61,7 @@ describe('AuthenticateHandler integration', () => {
 
     it('should throw an error if `scope` was given and `addAuthorizedScopesHeader()` is missing', () => {
       try {
+        // eslint-disable-next-line no-new
         new AuthenticateHandler({
           addAcceptedScopesHeader: true,
           model: { getAccessToken() {} },
@@ -75,6 +79,7 @@ describe('AuthenticateHandler integration', () => {
 
     it('should throw an error if `scope` was given and the model does not implement `verifyScope()`', () => {
       try {
+        // eslint-disable-next-line no-new
         new AuthenticateHandler({
           addAcceptedScopesHeader: true,
           addAuthorizedScopesHeader: true,
@@ -121,7 +126,10 @@ describe('AuthenticateHandler integration', () => {
       });
 
       try {
-        await handler.handle(undefined, undefined);
+        await handler.handle(
+          (undefined as unknown) as Request,
+          (undefined as unknown) as Response,
+        );
 
         should.fail('should.fail', '');
       } catch (e) {
@@ -297,9 +305,6 @@ describe('AuthenticateHandler integration', () => {
 
   describe('getTokenFromRequestHeader()', () => {
     it('should throw an error if the token is malformed', () => {
-      const handler = new AuthenticateHandler({
-        model: { getAccessToken() {} },
-      });
       const request = new Request({
         body: {},
         headers: {
@@ -310,7 +315,7 @@ describe('AuthenticateHandler integration', () => {
       });
 
       try {
-        handler.getTokenFromRequestHeader(request);
+        AuthenticateHandler.getTokenFromRequestHeader(request);
 
         should.fail('should.fail', '');
       } catch (e) {
@@ -322,9 +327,6 @@ describe('AuthenticateHandler integration', () => {
     });
 
     it('should return the bearer token', () => {
-      const handler = new AuthenticateHandler({
-        model: { getAccessToken() {} },
-      });
       const request = new Request({
         body: {},
         headers: {
@@ -334,7 +336,9 @@ describe('AuthenticateHandler integration', () => {
         query: {},
       });
 
-      const bearerToken = handler.getTokenFromRequestHeader(request);
+      const bearerToken = AuthenticateHandler.getTokenFromRequestHeader(
+        request,
+      );
 
       bearerToken.should.equal('foo');
     });
@@ -347,7 +351,7 @@ describe('AuthenticateHandler integration', () => {
       });
 
       try {
-        handler.getTokenFromRequestQuery(undefined);
+        handler.getTokenFromRequestQuery((undefined as unknown) as Request);
 
         should.fail('should.fail', '');
       } catch (e) {
@@ -370,9 +374,6 @@ describe('AuthenticateHandler integration', () => {
 
   describe('getTokenFromRequestBody()', () => {
     it('should throw an error if the method is `GET`', () => {
-      const handler = new AuthenticateHandler({
-        model: { getAccessToken() {} },
-      });
       const request = new Request({
         body: { access_token: 'foo' },
         headers: {},
@@ -381,7 +382,7 @@ describe('AuthenticateHandler integration', () => {
       });
 
       try {
-        handler.getTokenFromRequestBody(request);
+        AuthenticateHandler.getTokenFromRequestBody(request);
         should.fail('should.fail', '');
       } catch (e) {
         e.should.be.an.instanceOf(InvalidRequestError);
@@ -392,9 +393,6 @@ describe('AuthenticateHandler integration', () => {
     });
 
     it('should throw an error if the media type is not `application/x-www-form-urlencoded`', () => {
-      const handler = new AuthenticateHandler({
-        model: { getAccessToken() {} },
-      });
       const request = new Request({
         body: { access_token: 'foo' },
         headers: {},
@@ -403,7 +401,7 @@ describe('AuthenticateHandler integration', () => {
       });
 
       try {
-        handler.getTokenFromRequestBody(request);
+        AuthenticateHandler.getTokenFromRequestBody(request);
 
         should.fail('should.fail', '');
       } catch (e) {
@@ -415,9 +413,6 @@ describe('AuthenticateHandler integration', () => {
     });
 
     it('should return the bearer token', () => {
-      const handler = new AuthenticateHandler({
-        model: { getAccessToken() {} },
-      });
       const request = new Request({
         body: { access_token: 'foo' },
         headers: {
@@ -428,7 +423,7 @@ describe('AuthenticateHandler integration', () => {
         query: {},
       });
 
-      handler.getTokenFromRequestBody(request).should.equal('foo');
+      AuthenticateHandler.getTokenFromRequestBody(request).should.equal('foo');
     });
   });
 
@@ -529,12 +524,9 @@ describe('AuthenticateHandler integration', () => {
       const accessToken: any = {
         accessTokenExpiresAt: new Date(new Date().getTime() / 2),
       };
-      const handler = new AuthenticateHandler({
-        model: { getAccessToken() {} },
-      });
 
       try {
-        handler.validateAccessToken(accessToken);
+        AuthenticateHandler.validateAccessToken(accessToken);
 
         should.fail('should.fail', '');
       } catch (e) {
@@ -548,11 +540,10 @@ describe('AuthenticateHandler integration', () => {
         user: {},
         accessTokenExpiresAt: new Date(new Date().getTime() + 10000),
       };
-      const handler = new AuthenticateHandler({
-        model: { getAccessToken() {} },
-      });
 
-      handler.validateAccessToken(accessToken).should.equal(accessToken);
+      AuthenticateHandler.validateAccessToken(accessToken).should.equal(
+        accessToken,
+      );
     });
   });
 

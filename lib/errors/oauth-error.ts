@@ -1,9 +1,13 @@
 import * as statuses from 'statuses';
 
-export class OAuthError extends Error {
+// eslint-disable-next-line import/prefer-default-export
+export class OAuthError extends Error implements Record<string, any> {
   code: any;
+
   status: any;
+
   statusCode: any;
+
   constructor(messageOrError: string | Error, properties: any = {}) {
     super();
     let message =
@@ -16,16 +20,21 @@ export class OAuthError extends Error {
     if (error) {
       props.inner = error;
     }
-    if (!message) {
-      message = statuses[props.code];
+    const statusMessage = statuses[props.code];
+    if (!message && statusMessage) {
+      message = statusMessage;
     }
+    // eslint-disable-next-line no-multi-assign
     this.code = this.status = this.statusCode = props.code;
     this.message = message;
 
     const ignoreAttr = ['code', 'message'];
+    const me: Record<string, any> = this;
     Object.keys(props)
       .filter(key => !ignoreAttr.includes(key))
-      .forEach(key => (this[key] = props[key]));
+      .forEach(key => {
+        me[key] = props[key];
+      });
 
     Error.captureStackTrace(this, OAuthError);
   }

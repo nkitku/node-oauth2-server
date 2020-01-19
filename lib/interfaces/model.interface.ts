@@ -10,7 +10,7 @@ export interface BaseModel {
   generateAccessToken?(
     client: Client,
     user: User,
-    scope: string,
+    scope: string | undefined,
   ): Promise<string>;
 
   /**
@@ -52,7 +52,7 @@ export interface AuthorizationCodeModel
   generateRefreshToken?(
     client: Client,
     user: User,
-    scope: string,
+    scope: string | undefined,
   ): Promise<string>;
 
   /**
@@ -62,7 +62,7 @@ export interface AuthorizationCodeModel
   generateAuthorizationCode?(
     client: Client,
     user: User,
-    scope: string,
+    scope: string | undefined,
   ): Promise<string>;
 
   /**
@@ -92,8 +92,13 @@ export interface AuthorizationCodeModel
    * Invoked to check if the requested scope is
    *  valid for a particular client/user combination.
    *
+   * Must return a default scope for an undefined scope.
    */
-  validateScope?(user: User, client: Client, scope: string): Promise<string>;
+  validateScope?(
+    user: User,
+    client: Client,
+    scope: string | undefined,
+  ): Promise<string>;
 }
 
 export interface PasswordModel extends BaseModel, RequestAuthenticationModel {
@@ -104,7 +109,7 @@ export interface PasswordModel extends BaseModel, RequestAuthenticationModel {
   generateRefreshToken?(
     client: Client,
     user: User,
-    scope: string,
+    scope: string | undefined,
   ): Promise<string>;
 
   /**
@@ -118,8 +123,13 @@ export interface PasswordModel extends BaseModel, RequestAuthenticationModel {
    * Invoked to check if the requested scope
    * is valid for a particular client/user combination.
    *
+   * Must return a default scope for an undefined scope.
    */
-  validateScope?(user: User, client: Client, scope: string): Promise<string>;
+  validateScope?(
+    user: User,
+    client: Client,
+    scope: string | undefined,
+  ): Promise<string>;
 }
 
 export interface RefreshTokenModel
@@ -132,7 +142,7 @@ export interface RefreshTokenModel
   generateRefreshToken?(
     client: Client,
     user: User,
-    scope: string,
+    scope: string | undefined,
   ): Promise<string>;
 
   /**
@@ -160,8 +170,14 @@ export interface ClientCredentialsModel
   /**
    * Invoked to check if the requested scope is valid for a particular client/user combination.
    *
+   * Must return a default scope for an undefined scope.
+   *
    */
-  validateScope?(user: User, client: Client, scope: string): Promise<string>;
+  validateScope?(
+    user: User,
+    client: Client,
+    scope: string | undefined,
+  ): Promise<string>;
 }
 
 export interface ExtensionModel extends BaseModel, RequestAuthenticationModel {}

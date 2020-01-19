@@ -9,6 +9,7 @@ import { Client, RefreshToken, User } from '../interfaces';
 import { Request } from '../request';
 import * as is from '../validator/is';
 
+// eslint-disable-next-line import/prefer-default-export
 export class RefreshTokenGrantType extends AbstractGrantType {
   constructor(options: any = {}) {
     super(options);
@@ -134,7 +135,7 @@ export class RefreshTokenGrantType extends AbstractGrantType {
    * Save token.
    */
 
-  async saveToken(user: User, client: Client, scope: string) {
+  async saveToken(user: User, client: Client, scope: string | undefined) {
     const accessToken = await this.generateAccessToken(client, user, scope);
     const refreshToken = await this.generateRefreshToken(client, user, scope);
     const accessTokenExpiresAt = this.getAccessTokenExpiresAt();
