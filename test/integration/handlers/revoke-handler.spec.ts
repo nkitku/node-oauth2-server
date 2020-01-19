@@ -607,13 +607,6 @@ describe('RevokeHandler integration', () => {
 
   describe('getClientCredentials()', () => {
     it('should throw an error if `client_id` is missing', () => {
-      const model = {
-        getClient() {},
-        revokeToken() {},
-        getRefreshToken() {},
-        getAccessToken() {},
-      };
-      const handler: any = new RevokeHandler({ model });
       const request = new Request({
         body: { client_secret: 'foo' },
         headers: {},
@@ -622,7 +615,7 @@ describe('RevokeHandler integration', () => {
       });
 
       try {
-        handler.getClientCredentials(request);
+        RevokeHandler.getClientCredentials(request);
 
         should.fail('should.fail', '');
       } catch (e) {
@@ -634,13 +627,6 @@ describe('RevokeHandler integration', () => {
     });
 
     it('should throw an error if `client_secret` is missing', () => {
-      const model = {
-        getClient() {},
-        revokeToken() {},
-        getRefreshToken() {},
-        getAccessToken() {},
-      };
-      const handler: any = new RevokeHandler({ model });
       const request = new Request({
         body: { client_id: 'foo' },
         headers: {},
@@ -649,7 +635,7 @@ describe('RevokeHandler integration', () => {
       });
 
       try {
-        handler.getClientCredentials(request);
+        RevokeHandler.getClientCredentials(request);
 
         should.fail('should.fail', '');
       } catch (e) {
@@ -662,13 +648,6 @@ describe('RevokeHandler integration', () => {
 
     describe('with `client_id` and `client_secret` in the request header as basic auth', () => {
       it('should return a client', () => {
-        const model = {
-          getClient() {},
-          revokeToken() {},
-          getRefreshToken() {},
-          getAccessToken() {},
-        };
-        const handler: any = new RevokeHandler({ model });
         const request = new Request({
           body: {},
           headers: {
@@ -680,7 +659,7 @@ describe('RevokeHandler integration', () => {
           method: 'ANY',
           query: {},
         });
-        const credentials = handler.getClientCredentials(request);
+        const credentials = RevokeHandler.getClientCredentials(request);
 
         credentials.should.eql({ clientId: 'foo', clientSecret: 'bar' });
       });
@@ -688,20 +667,13 @@ describe('RevokeHandler integration', () => {
 
     describe('with `client_id` and `client_secret` in the request body', () => {
       it('should return a client', () => {
-        const model = {
-          getClient() {},
-          revokeToken() {},
-          getRefreshToken() {},
-          getAccessToken() {},
-        };
-        const handler: any = new RevokeHandler({ model });
         const request = new Request({
           body: { client_id: 'foo', client_secret: 'bar' },
           headers: {},
           method: 'ANY',
           query: {},
         });
-        const credentials = handler.getClientCredentials(request);
+        const credentials = RevokeHandler.getClientCredentials(request);
 
         credentials.should.eql({ clientId: 'foo', clientSecret: 'bar' });
       });
@@ -1054,13 +1026,6 @@ describe('RevokeHandler integration', () => {
 
   describe('getTokenFromRequest()', () => {
     it('should throw an error if `accessToken` is missing', () => {
-      const model = {
-        getClient() {},
-        revokeToken() {},
-        getRefreshToken() {},
-        getAccessToken() {},
-      };
-      const handler: any = new RevokeHandler({ model });
       const request = new Request({
         body: {},
         headers: {},
@@ -1069,7 +1034,7 @@ describe('RevokeHandler integration', () => {
       });
 
       try {
-        handler.getTokenFromRequest(request);
+        RevokeHandler.getTokenFromRequest(request);
 
         should.fail('should.fail', '');
       } catch (e) {

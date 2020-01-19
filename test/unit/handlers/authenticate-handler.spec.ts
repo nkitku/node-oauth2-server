@@ -22,15 +22,15 @@ describe('AuthenticateHandler', () => {
           query: {},
         });
 
-        sinon.stub(handler, 'getTokenFromRequestHeader');
+        const stubbed = sinon.stub(AuthenticateHandler, 'getTokenFromRequestHeader');
 
         handler.getTokenFromRequest(request);
 
-        handler.getTokenFromRequestHeader.callCount.should.equal(1);
-        handler.getTokenFromRequestHeader.firstCall.args[0].should.equal(
+        stubbed.callCount.should.equal(1);
+        stubbed.firstCall.args[0].should.equal(
           request,
         );
-        handler.getTokenFromRequestHeader.restore();
+        stubbed.restore();
       });
     });
 
@@ -70,13 +70,13 @@ describe('AuthenticateHandler', () => {
           query: {},
         });
 
-        sinon.stub(handler, 'getTokenFromRequestBody');
+        const stubbed = sinon.stub(AuthenticateHandler, 'getTokenFromRequestBody');
 
         handler.getTokenFromRequest(request);
 
-        handler.getTokenFromRequestBody.callCount.should.equal(1);
-        handler.getTokenFromRequestBody.firstCall.args[0].should.equal(request);
-        handler.getTokenFromRequestBody.restore();
+        stubbed.callCount.should.equal(1);
+        stubbed.firstCall.args[0].should.equal(request);
+        stubbed.restore();
       });
     });
   });
