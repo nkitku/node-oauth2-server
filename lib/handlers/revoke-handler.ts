@@ -1,4 +1,4 @@
-import auth from 'basic-auth';
+import * as auth from 'basic-auth';
 import {
   InvalidArgumentError,
   InvalidClientError,

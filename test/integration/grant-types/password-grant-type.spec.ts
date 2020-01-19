@@ -98,9 +98,15 @@ describe('PasswordGrantType integration', () => {
         accessTokenLifetime: 123,
         model,
       });
+      const request = new Request({
+        body: { code: 12345 },
+        headers: {},
+        method: 'ANY',
+        query: {},
+      });
 
       try {
-        await grantType.handle(new Request(), (undefined as unknown) as Client);
+        await grantType.handle(request, (undefined as unknown) as Client);
 
         should.fail('should.fail', '');
       } catch (e) {

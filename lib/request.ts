@@ -1,4 +1,4 @@
-import typeis from 'type-is';
+import * as typeis from 'type-is';
 import { InvalidArgumentError } from './errors';
 import { hasOwnProperty } from './utils/fn';
 

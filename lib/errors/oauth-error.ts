@@ -1,4 +1,4 @@
-import statuses from 'statuses';
+import * as statuses from 'statuses';
 
 // eslint-disable-next-line import/prefer-default-export
 export class OAuthError extends Error implements Record<string, any> {
